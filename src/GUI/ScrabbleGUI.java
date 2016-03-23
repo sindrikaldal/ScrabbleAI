@@ -14,36 +14,43 @@ import javax.swing.JPanel;
 import Board.Board;
 import Board.Square;
 import org.quinto.dawg.ModifiableDAWGSet;
+import Board.SquareType;
 
 public class ScrabbleGUI extends JFrame {
-    /**
-     *
-     */
-    private static final long serialVersionUID = 1L;
 
     ModifiableDAWGSet dawg = new ModifiableDAWGSet();
 
 
 
     public static final int SQUARE_SIZE = 15;
+    private static final long serialVersionUID = 1L;
 
     Board board;
 
-    JPanel scorePanel = new JPanel();
-    JLabel score1Label = new JLabel();
-    JLabel score2Label = new JLabel();
-
-    JPanel gridPanel = new JPanel();
-    JLabel[][] grid = new JLabel[Board.BOARD_SIZE][Board.BOARD_SIZE];
-    JPanel[][] squares = new JPanel[Board.BOARD_SIZE][Board.BOARD_SIZE];
+    JPanel scorePanel;
+    JLabel PlayerOneScore;
+    JLabel Player2Score;
+    JPanel gridPanel;
+    JLabel[][] grid;
+    JPanel[][] squares ;
 
     public ScrabbleGUI(Board board) {
+
         setLayout(new BorderLayout());
         Toolkit tk = Toolkit.getDefaultToolkit();
         Dimension screenSize = tk.getScreenSize();
         setLocation(screenSize.width / 4, screenSize.height / 4);
 
         this.board = board;
+
+        /*Initialize all the JFrame compontents*/
+        grid = new JLabel[board.getBoardSize()][board.getBoardSize()];
+        squares = new JPanel[board.getBoardSize()][board.getBoardSize()];
+        scorePanel = new JPanel();
+        PlayerOneScore = new JLabel();
+        Player2Score = new JLabel();
+        gridPanel = new JPanel();
+
         initGUI();
         setVisible(true);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -59,20 +66,20 @@ public class ScrabbleGUI extends JFrame {
 
     private void initScorePanel() {
         scorePanel.setLayout(new GridLayout(1, 2));
-        score1Label.setText(player1.getClass().getName());
-        score2Label.setText(player2.getClass().getName());
-        scorePanel.add(score1Label);
-        scorePanel.add(score2Label);
+//        score1Label.setText(player1.getClass().getName());
+//        score2Label.setText(player2.getClass().getName());
+//        scorePanel.add(score1Label);
+//        scorePanel.add(score2Label);
     }
 
     private void initGrid() {
-        gridPanel.setLayout(new GridLayout(Board.BOARD_SIZE, Board.BOARD_SIZE));
-        for (int row = 0; row < Board.BOARD_SIZE; row++) {
-            for (int column = 0; column < Board.BOARD_SIZE; column++) {
-                Square square = board.getSquare(row, column);
+        gridPanel.setLayout(new GridLayout(board.getBoardSize(), board.getBoardSize()));
+        for (int row = 0; row < board.getBoardSize(); row++) {
+            for (int column = 0; column < board.getBoardSize(); column++) {
+                Square square = board.getBoard()[row][column];
                 JPanel panel = new JPanel();
                 JLabel label = new JLabel(getContent(square));
-                label.setBackground(getSquareColor(square));
+                label.setBackground(Color.BLACK);
                 panel.setBackground(getSquareColor(square));
                 panel.setSize(50, 50);
                 panel.setBorder(BorderFactory.createEtchedBorder());
@@ -85,61 +92,56 @@ public class ScrabbleGUI extends JFrame {
     }
 
     public Color getSquareColor(Square square) {
-        char content = square.getContent();
-        switch (content) {
-            case Square.THREE_WORD_BONUS:
+        switch(square.getSquareType()) {
+            case TRIPLE_WORD:
                 return Color.RED;
-            case Square.TWO_WORD_BONUS:
-                return new Color(255, 228, 150);
-            case Square.THREE_LETTER_BONUS:
+            case DOUBLE_WORD:
+                return Color.PINK;
+            case TRIPLE_LETTER:
+                return Color.BLUE;
+            case DOUBLE_LETTER:
                 return Color.CYAN;
-            case Square.TWO_LETTER_BONUS:
-                return new Color(100, 149, 237);
-            case Square.CENTER_SQUARE:
-                return new Color(0, 0, 0);
+            default:
+                return Color.WHITE;
         }
-        return new Color(210, 210, 210);
     }
 
     private String getContent(Square square) {
-        char content = square.getContent();
-        if (square.containsLetter()) {
-            return ""+content;
-        } else {
-            switch(content) {
-                case Square.THREE_WORD_BONUS :
-                    return "3W";
-                case Square.TWO_WORD_BONUS :
-                    return "2W";
-                case Square.THREE_LETTER_BONUS :
-                    return "3L";
-                case Square.TWO_LETTER_BONUS :
-                    return "2L";
-            }
-        }
-        return "";
-    }
 
-    public void updateScores(Player player, int turn) {
-        String text = (turn < 0) ? player1.getClass().getSimpleName() : player2
-                .getClass().getSimpleName();
-
-        text = text + ": " + " (" + player.getScore() + ") points!";
-        if (turn < 0)
-            score1Label.setText(text);
-        else
-            score2Label.setText(text);
-    }
-    public void updateBoard() {
-        for (int row = 0; row < Board.BOARD_SIZE; row++) {
-            for (int column = 0; column < Board.BOARD_SIZE; column++) {
-                JLabel label = grid[row][column];
-                Square square = board.getSquare(row, column);
-                if (square.containsLetter())
-                    squares[row][column].setBackground(Color.WHITE);
-                label.setText(getContent(square));
-            }
+        switch(square.getSquareType()) {
+            case TRIPLE_WORD:
+                return "3W";
+            case DOUBLE_WORD:
+                return "2W";
+            case TRIPLE_LETTER:
+                return "3L";
+            case DOUBLE_LETTER:
+                return "2L";
+            default:
+                return "";
         }
     }
+
+//    public void updateScores(Player player, int turn) {
+//        String text = (turn < 0) ? player1.getClass().getSimpleName() : player2
+//                .getClass().getSimpleName();
+//
+//        text = text + ": " + " (" + player.getScore() + ") points!";
+//        if (turn < 0)
+//            score1Label.setText(text);
+//        else
+//            score2Label.setText(text);
+//    }
+//    public void updateBoard() {
+//        for (int row = 0; row < Board.BOARD_SIZE; row++) {
+//            for (int column = 0; column < Board.BOARD_SIZE; column++) {
+//                JLabel label = grid[row][column];
+//                Square square = board.getSquare(row, column);
+//                if (square.containsLetter())
+//                    squares[row][column].setBackground(Color.WHITE);
+//                label.setText(getContent(square));
+//            }
+//        }
+//    }
 
 }
