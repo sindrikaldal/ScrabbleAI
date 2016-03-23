@@ -1,0 +1,2 @@
+package Board;
+public enum SquareType {NORMAL, MIDDLE, DOUBLE_LETTER, TRIPLE_LETTER, DOUBLE_WORD, TRIPLE_WORD}
