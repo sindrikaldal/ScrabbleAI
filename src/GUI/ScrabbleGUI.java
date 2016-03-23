@@ -19,7 +19,6 @@ public class ScrabbleGUI extends JFrame {
 
 
 
-
     public static final int SQUARE_SIZE = 15;
     private static final long serialVersionUID = 1L;
 
