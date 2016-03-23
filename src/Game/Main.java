@@ -41,7 +41,7 @@ public class Main {
     }
 
 
-    public void storeWordCollection() {
+    void storeWordCollection() {
         try {
             try {
                 lines = Files.readAllLines(
