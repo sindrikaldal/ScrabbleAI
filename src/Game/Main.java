@@ -5,6 +5,8 @@ import GUI.ScrabbleGUI;
 import org.quinto.dawg.ModifiableDAWGSet;
 
 import java.io.IOException;
+import java.net.URISyntaxException;
+import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -39,9 +41,14 @@ public class Main {
     }
 
 
-    public static void storeWordCollection() {
+    public void storeWordCollection() {
         try {
-            lines = Files.readAllLines(Paths.get("/Users/eysteinn/Desktop/AI/finalProject/ordmyndalisti.txt"), StandardCharsets.UTF_8);
+            try {
+                lines = Files.readAllLines(
+                        Paths.get(this.getClass().getResource("ordmyndalisti.txt").toURI()), Charset.defaultCharset());
+            } catch (URISyntaxException e) {
+                e.printStackTrace();
+            }
         } catch (IOException e) {
             e.printStackTrace();
         }
