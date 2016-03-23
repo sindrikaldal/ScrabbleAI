@@ -13,12 +13,17 @@ import javax.swing.JPanel;
 
 import Board.Board;
 import Board.Square;
+import org.quinto.dawg.ModifiableDAWGSet;
 
 public class ScrabbleGUI extends JFrame {
     /**
      *
      */
     private static final long serialVersionUID = 1L;
+
+    ModifiableDAWGSet dawg = new ModifiableDAWGSet();
+
+
 
     public static final int SQUARE_SIZE = 15;
 
