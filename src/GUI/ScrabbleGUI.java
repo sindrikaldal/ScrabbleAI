@@ -21,7 +21,6 @@ public class ScrabbleGUI extends JFrame {
     ModifiableDAWGSet dawg = new ModifiableDAWGSet();
 
 
-
     public static final int SQUARE_SIZE = 15;
     private static final long serialVersionUID = 1L;
 
