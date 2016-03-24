@@ -28,24 +28,10 @@ public class WordCollection {
 
     private void importWordCollection() {
         fileReader.storeWordCollection();
-        System.out.println("Done reading word collection");
-        System.out.println("Building DAWG from string list");
-        dawg.addAll(fileReader.getLines());
-        System.out.println("Done building DAWG");
-        System.out.println("DAWG size " + dawg.size());
-        System.out.println("DAWG node count " + dawg.getNodeCount());
-
-        Iterable<String> testSet = dawg.getStringsWithSubstring("hot"); //{"str1"}
-
-        for(String s: testSet){
-            System.out.println(s);
-        }
-
         dawg.addAll(fileReader.getLines());
     }
 
     private void initalizeLetters() {
-
         letters.add(new Letter('A', 1));
         letters.add(new Letter('Á', 3));
         letters.add(new Letter('B', 5));
