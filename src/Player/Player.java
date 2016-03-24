@@ -1,12 +1,10 @@
 package Player;
 
-import WordCollection.Letter;
-
-import java.util.List;
+import Move.Move;
 
 /**
  * Created by sindrikaldal on 23/03/16.
  */
 public interface Player {
-    public void makeMove ();
+    public Move makeMove ();
 }

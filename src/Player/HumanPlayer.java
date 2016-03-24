@@ -1,6 +1,7 @@
 package Player;
 
 import Board.Board;
+import Move.Move;
 import WordCollection.Letter;
 
 import java.util.ArrayList;
@@ -52,8 +53,8 @@ public class HumanPlayer implements Player {
     //endregion getters an
 
     @Override
-    public void makeMove() {
-        
+    public Move makeMove() {
+
     }
 
 }
