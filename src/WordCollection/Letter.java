@@ -6,10 +6,12 @@ package WordCollection;
 public class Letter {
     private char letter;
     private int value;
+    private int instances;
 
-    public Letter(char letter, int value) {
+    public Letter(char letter, int value, int instances) {
         this.letter = letter;
         this.value = value;
+        this.instances = instances;
     }
 
     public char getLetter() {
@@ -26,5 +28,13 @@ public class Letter {
 
     public void setValue(int value) {
         this.value = value;
+    }
+
+    public int getInstances() {
+        return instances;
+    }
+
+    public void setInstances(int instances) {
+        this.instances = instances;
     }
 }
