@@ -10,11 +10,14 @@ public class Game {
 
     private ScrabbleGUI gui;
     private WordCollection wordCollection;
+    private Bag bag;
+
 
     public Game() {
         System.out.println("Initalizing game..");
-        gui = new ScrabbleGUI(new Board());
         wordCollection = new WordCollection();
+        gui = new ScrabbleGUI(new Board());
+        bag = new Bag(wordCollection.getLetters());
         System.out.println("Done!");
     }
 
