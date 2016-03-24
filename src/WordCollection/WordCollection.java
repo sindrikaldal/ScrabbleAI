@@ -3,9 +3,7 @@ package WordCollection;
 import FileReader.FileReader;
 import org.quinto.dawg.ModifiableDAWGSet;
 
-import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
 
 /**
  * Created by sindrikaldal on 23/03/16.
@@ -30,6 +28,19 @@ public class WordCollection {
 
     private void importWordCollection() {
         fileReader.storeWordCollection();
+        System.out.println("Done reading word collection");
+        System.out.println("Building DAWG from string list");
+        dawg.addAll(fileReader.getLines());
+        System.out.println("Done building DAWG");
+        System.out.println("DAWG size " + dawg.size());
+        System.out.println("DAWG node count " + dawg.getNodeCount());
+
+        Iterable<String> testSet = dawg.getStringsWithSubstring("hot"); //{"str1"}
+
+        for(String s: testSet){
+            System.out.println(s);
+        }
+
         dawg.addAll(fileReader.getLines());
     }
 

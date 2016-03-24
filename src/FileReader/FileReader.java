@@ -1,6 +1,7 @@
 package FileReader;
 
 import java.io.IOException;
+import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
@@ -19,12 +20,16 @@ public class FileReader {
     }
 
     public void storeWordCollection() {
+        String fileName = "ordmyndalisti.txt";
+        URI uri = null;
         try {
-            try {
-                lines = Files.readAllLines(Paths.get(this.getClass().getResource("ordmyndalisti.txt").toURI()), Charset.defaultCharset());
-            } catch (URISyntaxException e) {
-                e.printStackTrace();
-            }
+            uri = this.getClass().getResource(fileName).toURI();
+        } catch (URISyntaxException e) {
+            e.printStackTrace();
+        }
+        try {
+                lines = Files.readAllLines(Paths.get(uri), Charset.defaultCharset());
+
         } catch (IOException e) {
             e.printStackTrace();
         }
