@@ -14,9 +14,7 @@ public class Bag {
     private List<Letter> bag;
 
     public Bag(ArrayList<Letter> letters) {
-
         bag = new ArrayList<Letter>();
-
         for(Letter l : letters) {
             for(int i = 0; i < l.getInstances(); i++) {
                 bag.add(l);

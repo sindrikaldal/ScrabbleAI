@@ -32,7 +32,6 @@ public class WordCollection {
     }
 
     private void initalizeLetters() {
-
         letters.add(new Letter('A', 1, 11));
         letters.add(new Letter('Á', 3, 2));
         letters.add(new Letter('B', 5, 1));
