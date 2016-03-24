@@ -15,9 +15,11 @@ public class Game {
 
     public Game() {
         System.out.println("Initalizing game..");
+
         wordCollection = new WordCollection();
-        gui = new ScrabbleGUI(new Board());
         bag = new Bag(wordCollection.getLetters());
+        gui = new ScrabbleGUI(new Board());
+
         System.out.println("Done!");
     }
 
