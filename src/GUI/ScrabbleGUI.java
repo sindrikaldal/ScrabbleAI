@@ -157,7 +157,7 @@ public class ScrabbleGUI extends JFrame {
         if(player instanceof  HumanPlayer) {
             PlayerOneLabel.setText("Player 1 : ");
         } else {
-            PlayerTwoLabel.setText("Player 1 : ");
+            PlayerTwoLabel.setText("Player 2 : ");
         }
     }
 
@@ -165,29 +165,18 @@ public class ScrabbleGUI extends JFrame {
 
         updateScores(move.getPlayer());
 
-
         if(move.getDirection().equals(Direction.HORIZONTAL)) {
             for(int i = move.getX(); i < move.getWord().length(); i++) {
-
+                squares[i][move.getY()].setBackground(Color.WHITE);
+                squareLabels[i][move.getY()].setText(Character.toString(move.getWord().charAt(i - move.getX())));
             }
         }
-
-        for(int i = 0; i < move.getWord().length(); i++) {
-            if(move.getDirection().equals(Direction.HORIZONTAL)) {
-
+        else {
+            for(int i = move.getY(); i < move.getWord().length(); i++) {
+                squares[move.getX()][i].setBackground(Color.WHITE);
+                squareLabels[i][move.getY()].setText(Character.toString(move.getWord().charAt(i - move.getY())));
             }
         }
-
-
-//        for (int row = 0; row < Board.BOARD_SIZE; row++) {
-//            for (int column = 0; column < Board.BOARD_SIZE; column++) {
-//                JLabel label = grid[row][column];
-//                Square square = board.getSquare(row, column);
-//                if (square.containsLetter())
-//                    squares[row][column].setBackground(Color.WHITE);
-//                label.setText(getContent(square));
-//            }
-//        }
     }
 
 }
