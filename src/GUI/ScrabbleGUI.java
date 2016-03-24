@@ -165,7 +165,7 @@ public class ScrabbleGUI extends JFrame {
 
         updateScores(move.getPlayer());
 
-        if(move.getDirection().equals(Direction.HORIZONTAL)) {
+        if(move.getDirection().equals(Direction.VERTICAL)) {
             for(int i = move.getX(); i < move.getWord().length(); i++) {
                 squares[i][move.getY()].setBackground(Color.WHITE);
                 squareLabels[i][move.getY()].setText(Character.toString(move.getWord().charAt(i - move.getX())));
