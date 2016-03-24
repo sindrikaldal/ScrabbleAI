@@ -29,7 +29,7 @@ public class WordCollection {
         System.out.println("Done building DAWG");
         System.out.println("DAWG size " + dawg.size());
         System.out.println("DAWG node count " + dawg.getNodeCount());
- 
+
         Iterable<String> testSet = dawg.getStringsWithSubstring("hot"); //{"str1"}
 
         for(String s: testSet){
