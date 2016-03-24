@@ -27,8 +27,9 @@ public class WordCollection {
     }
 
     private void importWordCollection() {
-        fileReader.storeWordCollection();
-        dawg.addAll(fileReader.getLines());
+        // Comment this out for faster debugging!
+//        fileReader.storeWordCollection();
+//        dawg.addAll(fileReader.getLines());
     }
 
     private void initalizeLetters() {

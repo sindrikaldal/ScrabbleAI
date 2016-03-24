@@ -34,5 +34,8 @@ public class Game {
     }
 
     public void startGame() {
+        while(true) {
+            gui.updateBoard(playerOne.makeMove());
+        }
     }
 }
