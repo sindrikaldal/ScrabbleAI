@@ -13,17 +13,31 @@ import java.util.Scanner;
  */
 public class HumanPlayer implements Player {
     int MAX_TILES_ON_HAND = 8;
-    List<Letter> currentTiles;
-    List<Integer> scoreHistory;
-    Board board;
+    private List<Letter> currentTiles;
+    private List<Integer> scoreHistory;
+    private Board board;
+    private int totalScore;
 
-    public HumanPlayer(List<Letter> currentTiles, Board board) {
+
+    public HumanPlayer() {
         this.currentTiles = currentTiles;
         this.scoreHistory = new ArrayList<Integer>();
         this.board = board;
+        this.totalScore = 0;
+
     }
 
     //region getters and setters
+
+    public int getTotalScore() {
+        return totalScore;
+    }
+    public void setTotalScore(int totalScore) {
+        this.totalScore = totalScore;
+    }
+    public void updateTotalScore(int newScore) {
+        this.totalScore += newScore;
+    }
     public int getMAX_TILES_ON_HAND() {
         return MAX_TILES_ON_HAND;
     }
@@ -70,7 +84,7 @@ public class HumanPlayer implements Player {
             } else if (input.equals("V") || input.equals("v")){
                 direction = Direction.VERTICAL;
             }
-        } while(input.equals("H") || input.equals("h") || input.equals("V") || input.equals("v") || input.equals("v"));
+        } while(!(input.equals("H") || input.equals("h") || input.equals("V") || input.equals("v") || input.equals("v")));
         System.out.println("Input word to enter in field x:" + x + " y: " + y + " direction: " + direction);
         String wordToReturn = in.nextLine();
 
