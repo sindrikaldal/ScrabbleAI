@@ -169,12 +169,14 @@ public class ScrabbleGUI extends JFrame {
             for(int i = move.getX(); i < move.getWord().length(); i++) {
                 squares[i][move.getY()].setBackground(Color.WHITE);
                 squareLabels[i][move.getY()].setText(Character.toString(move.getWord().charAt(i - move.getX())));
+                board.getBoard()[i][move.getY()].setSquareType(SquareType.CONTAINS_LETTER);
             }
         }
         else {
             for(int i = move.getY(); i < move.getWord().length(); i++) {
                 squares[move.getX()][i].setBackground(Color.WHITE);
-                squareLabels[i][move.getY()].setText(Character.toString(move.getWord().charAt(i - move.getY())));
+                squareLabels[move.getX()][i].setText(Character.toString(move.getWord().charAt(i - move.getY())));
+                board.getBoard()[move.getX()][i].setSquareType(SquareType.CONTAINS_LETTER);
             }
         }
     }
