@@ -1,6 +1,7 @@
 package Game;
 
 import GUI.ScrabbleGUI;
+import Player.*;
 import WordCollection.WordCollection;
 import Board.Board;
 /**
@@ -12,6 +13,8 @@ public class Game {
     private WordCollection wordCollection;
     private Bag bag;
 
+    Player playerOne;
+    Player playerTwo;
 
     public Game() {
         System.out.println("Initalizing game..");
@@ -19,11 +22,17 @@ public class Game {
         wordCollection = new WordCollection();
         bag = new Bag(wordCollection.getLetters());
         gui = new ScrabbleGUI(new Board());
+        initalizePlayers();
+
 
         System.out.println("Done!");
     }
 
-    public void startGame() {
+    private void initalizePlayers() {
+        playerOne = new HumanPlayer();
+        playerTwo = new AgentFresco();
+    }
 
+    public void startGame() {
     }
 }

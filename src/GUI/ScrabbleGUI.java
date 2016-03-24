@@ -12,8 +12,10 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 import Board.Board;
+import Move.*;
 import Board.Square;
 import Board.SquareType;
+import Player.*;
 
 public class ScrabbleGUI extends JFrame {
 
@@ -27,10 +29,12 @@ public class ScrabbleGUI extends JFrame {
     JPanel scorePanel;
     JPanel PlayerOneScore;
     JPanel PlayerTwoScore;
+    JLabel PlayerOneLabel;
+    JLabel PlayerTwoLabel;
     JPanel gridPanel;
     JPanel letterPanel;
     JPanel[] letters;
-    JLabel[][] grid;
+    JLabel[][] squareLabels;
     JPanel[][] squares ;
 
     public ScrabbleGUI(Board board) {
@@ -45,7 +49,7 @@ public class ScrabbleGUI extends JFrame {
         setLocation(screenSize.width / 3, screenSize.height / 3);
 
         /* Initialize all the JFrame compontents */
-        grid = new JLabel[board.getBoardSize()][board.getBoardSize()];
+        squareLabels = new JLabel[board.getBoardSize()][board.getBoardSize()];
         squares = new JPanel[board.getBoardSize()][board.getBoardSize()];
         scorePanel = new JPanel();
         letters = new JPanel[LETTER_COUNT];
@@ -72,10 +76,14 @@ public class ScrabbleGUI extends JFrame {
 
     private void initScorePanel() {
         scorePanel.setLayout(new GridLayout(1, 2));
+
         PlayerOneScore.setSize(1, 2);
         PlayerTwoScore.setSize(1, 2);
-        PlayerOneScore.add(new JLabel("Player 1 : 0"));
-        PlayerTwoScore.add(new JLabel("Player 2 : 0"));
+        PlayerOneLabel = new JLabel("Player 1 : 0");
+        PlayerTwoLabel = new JLabel("Player 2 : 0");
+        PlayerOneScore.add(PlayerOneLabel);
+        PlayerTwoScore.add(PlayerTwoLabel);
+
         scorePanel.add(PlayerOneScore);
         scorePanel.add(PlayerTwoScore);
     }
@@ -108,7 +116,7 @@ public class ScrabbleGUI extends JFrame {
                 panel.setBorder(BorderFactory.createEtchedBorder());
                 panel.add(label);
                 squares[row][column] = panel;
-                grid[row][column] = label;
+                squareLabels[row][column] = label;
                 gridPanel.add(panel);
             }
         }
@@ -145,17 +153,32 @@ public class ScrabbleGUI extends JFrame {
         }
     }
 
-//    public void updateScores(Player player, int turn) {
-//        String text = (turn < 0) ? player1.getClass().getSimpleName() : player2
-//                .getClass().getSimpleName();
-//
-//        text = text + ": " + " (" + player.getScore() + ") points!";
-//        if (turn < 0)
-//            score1Label.setText(text);
-//        else
-//            score2Label.setText(text);
-//    }
-//    public void updateBoard() {
+    public void updateScores(Player player) {
+        if(player instanceof  HumanPlayer) {
+            PlayerOneLabel.setText("Player 1 : ");
+        } else {
+            PlayerTwoLabel.setText("Player 1 : ");
+        }
+    }
+
+    public void updateBoard(Move move) {
+
+        updateScores(move.getPlayer());
+
+
+        if(move.getDirection().equals(Direction.HORIZONTAL)) {
+            for(int i = move.getX(); i < move.getWord().length(); i++) {
+
+            }
+        }
+
+        for(int i = 0; i < move.getWord().length(); i++) {
+            if(move.getDirection().equals(Direction.HORIZONTAL)) {
+
+            }
+        }
+
+
 //        for (int row = 0; row < Board.BOARD_SIZE; row++) {
 //            for (int column = 0; column < Board.BOARD_SIZE; column++) {
 //                JLabel label = grid[row][column];
@@ -165,6 +188,6 @@ public class ScrabbleGUI extends JFrame {
 //                label.setText(getContent(square));
 //            }
 //        }
-//    }
+    }
 
 }
