@@ -13,8 +13,8 @@ public class Game {
 
     public Game() {
         System.out.println("Initalizing game..");
-        gui = new ScrabbleGUI(new Board());
         wordCollection = new WordCollection();
+        gui = new ScrabbleGUI(new Board());
         System.out.println("Done!");
     }
 
