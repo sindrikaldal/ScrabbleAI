@@ -94,6 +94,7 @@ public class Board {
                     }
                     else if(j == 7) {
                         this.board[i][j] = new Square(SquareType.CENTER_SQUARE, "", i, j);
+                        this.board[i][j].setAnchor(true);
                     }
                     else {
                         this.board[i][j] = new Square(SquareType.NORMAL, "", i, j);

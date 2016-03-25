@@ -6,25 +6,24 @@ import WordCollection.Letter;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 import java.util.Scanner;
+import Game.Bag;
 
-/**
- * Created by sindrikaldal on 23/03/16.
- */
 public class HumanPlayer implements Player {
-    int MAX_TILES_ON_HAND = 8;
-    private List<Letter> currentTiles;
+
+    int MAX_TILES_ON_HAND = 7;
+    private List<Letter> rack;
     private List<Integer> scoreHistory;
     private Board board;
     private int totalScore;
 
 
-    public HumanPlayer() {
-        this.currentTiles = currentTiles;
+    public HumanPlayer(Bag bag) {
         this.scoreHistory = new ArrayList<Integer>();
-        this.board = board;
+        rack = new ArrayList<Letter>();
         this.totalScore = 0;
-
+        fillRack(bag);
     }
 
     //region getters and setters
@@ -40,14 +39,6 @@ public class HumanPlayer implements Player {
     }
     public int getMAX_TILES_ON_HAND() {
         return MAX_TILES_ON_HAND;
-    }
-
-    public List<Letter> getCurrentTiles() {
-        return currentTiles;
-    }
-
-    public void setCurrentTiles(List<Letter> currentTiles) {
-        this.currentTiles = currentTiles;
     }
 
     public List<Integer> getScoreHistory() {
@@ -69,13 +60,18 @@ public class HumanPlayer implements Player {
 
     @Override
     public Move makeMove() {
+        /* A Scanner to receieve instructions from console */
         Scanner in = new Scanner(System.in);
+
         System.out.println("Enter the x coordinates of the word");
         int x = in.nextInt();
+
         System.out.println("Enter the y coordinates of the word");
         int y = in.nextInt();
+
         String input = null;
         Direction direction = null;
+
         do {
             System.out.println("Press H/h for horizontal word, V/v for vertical");
             input = in.nextLine();
@@ -85,10 +81,40 @@ public class HumanPlayer implements Player {
                 direction = Direction.VERTICAL;
             }
         } while(!(input.equals("H") || input.equals("h") || input.equals("V") || input.equals("v") || input.equals("v")));
+
         System.out.println("Input word to enter in field x:" + x + " y: " + y + " direction: " + direction);
         String wordToReturn = in.nextLine();
 
+        removeFromRack(wordToReturn);
         return new Move(this, x, y, direction, wordToReturn);
+    }
+
+    @Override
+    public void fillRack(Bag bag) {
+        Random random = new Random();
+        int rackSize = rack.size();
+        for(int i = 0; i < (MAX_TILES_ON_HAND - rackSize); i++) {
+            int randomNumber = random.nextInt(bag.getBag().size());
+            rack.add(bag.getBag().get(randomNumber));
+            bag.getBag().remove(randomNumber);
+        }
+    }
+
+    private void removeFromRack(String word) {
+        for(int i = 0; i < word.length(); i++) {
+            for(int j = 0; j < rack.size(); j++) {
+                if(rack.get(j).getLetter().equals(Character.toString(word.charAt(i)).toUpperCase())) {
+                    rack.remove(j);
+                    break;
+                }
+            }
+        }
+    }
+
+
+    @Override
+    public List<Letter> getRack() {
+        return rack;
     }
 
 }

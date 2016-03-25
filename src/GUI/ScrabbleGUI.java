@@ -23,6 +23,8 @@ public class ScrabbleGUI extends JFrame {
     public static final int LETTER_COUNT = 7;
     public static final int SQUARE_SIZE = 15;
     private static final long serialVersionUID = 1L;
+    private Player playerOne;
+    private Player playerTwo;
 
     Board board;
 
@@ -32,13 +34,16 @@ public class ScrabbleGUI extends JFrame {
     JLabel PlayerOneLabel;
     JLabel PlayerTwoLabel;
     JPanel gridPanel;
-    JPanel letterPanel;
-    JPanel[] letters;
+    JPanel rackPanel;
+    JPanel[] rack;
+    JLabel[] rackLabels;
     JLabel[][] squareLabels;
     JPanel[][] squares ;
 
-    public ScrabbleGUI(Board board) {
+    public ScrabbleGUI(Board board, Player playerOne, Player playerTwo) {
 
+        this.playerOne = playerOne;
+        this.playerTwo = playerTwo;
         this.board = board;
         this.setSize(new Dimension(15, 15));
 
@@ -52,11 +57,12 @@ public class ScrabbleGUI extends JFrame {
         squareLabels = new JLabel[board.getBoardSize()][board.getBoardSize()];
         squares = new JPanel[board.getBoardSize()][board.getBoardSize()];
         scorePanel = new JPanel();
-        letters = new JPanel[LETTER_COUNT];
+        rack = new JPanel[LETTER_COUNT];
         PlayerOneScore = new JPanel();
         PlayerTwoScore = new JPanel();
         gridPanel = new JPanel();
-        letterPanel = new JPanel();
+        rackPanel = new JPanel();
+        rackLabels = new JLabel[LETTER_COUNT];
 
         /* Initalize the board*/
         initGUI();
@@ -70,7 +76,7 @@ public class ScrabbleGUI extends JFrame {
         initScorePanel();
         initLetterPanel();
         add(gridPanel, BorderLayout.NORTH);
-        add(letterPanel, BorderLayout.SOUTH);
+        add(rackPanel, BorderLayout.SOUTH);
         add(scorePanel, BorderLayout.EAST);
     }
 
@@ -83,23 +89,23 @@ public class ScrabbleGUI extends JFrame {
         PlayerTwoLabel = new JLabel("Player 2 : 0");
         PlayerOneScore.add(PlayerOneLabel);
         PlayerTwoScore.add(PlayerTwoLabel);
-
         scorePanel.add(PlayerOneScore);
         scorePanel.add(PlayerTwoScore);
     }
 
     private void initLetterPanel(){
-        letterPanel.add(new JLabel("  Player letters  "));
-        letterPanel.setLayout(new GridLayout(1, 10));
-        letterPanel.setSize(1, 15);
-        for(int i = 0; i < LETTER_COUNT; i++) {
-            Square square = new Square(SquareType.RACK, "A");
+        rackPanel.add(new JLabel("  Player letters  "));
+        rackPanel.setLayout(new GridLayout(1, 10));
+        rackPanel.setSize(1, 15);
+        for(int i = 0; i < playerOne.getRack().size(); i++) {
             JPanel panel = new JPanel();
+            JLabel label = new JLabel(playerOne.getRack().get(i).getLetter());
             panel.setBackground(Color.WHITE);
             panel.setSize(1, 5);
             panel.setBorder(BorderFactory.createEtchedBorder());
-            panel.add(new JLabel("A"));
-            letterPanel.add(panel);
+            panel.add(label);
+            rackPanel.add(panel);
+            rackLabels[i] = label;
         }
     }
 
@@ -132,6 +138,8 @@ public class ScrabbleGUI extends JFrame {
                 return Color.BLUE;
             case DOUBLE_LETTER:
                 return Color.CYAN;
+            case CENTER_SQUARE:
+                return Color.PINK;
             default:
                 return Color.WHITE;
         }
@@ -148,6 +156,8 @@ public class ScrabbleGUI extends JFrame {
                 return "3L";
             case DOUBLE_LETTER:
                 return "2L";
+            case CENTER_SQUARE:
+                return "*";
             default:
                 return "";
         }
@@ -161,24 +171,39 @@ public class ScrabbleGUI extends JFrame {
         }
     }
 
+    public void updateLetterPanel(Player player) {
+        for(int i = 0; i < player.getRack().size(); i++) {
+            rackLabels[i].setText(player.getRack().get(i).getLetter());
+        }
+    }
+
     public void updateBoard(Move move) {
 
         updateScores(move.getPlayer());
 
         if(move.getDirection().equals(Direction.VERTICAL)) {
-            for(int i = move.getX(); i < move.getWord().length(); i++) {
-                squares[i][move.getY()].setBackground(Color.WHITE);
-                squareLabels[i][move.getY()].setText(Character.toString(move.getWord().charAt(i - move.getX())));
-                board.getBoard()[i][move.getY()].setSquareType(SquareType.CONTAINS_LETTER);
+            for(int i = move.getX(); i < move.getWord().length() + move.getX(); i++) {
+                if(move.getWord().charAt(i - move.getX()) != '*') {
+                    squares[i][move.getY()].setBackground(Color.WHITE);
+                    squareLabels[i][move.getY()].setText(Character.toString(move.getWord().charAt(i - move.getX())));
+                    board.getBoard()[i][move.getY()].setSquareType(SquareType.CONTAINS_LETTER);
+                    board.getBoard()[i][move.getY()].setValue(Character.toString(move.getWord().charAt(i - move.getX())));
+                }
             }
         }
         else {
-            for(int i = move.getY(); i < move.getWord().length(); i++) {
-                squares[move.getX()][i].setBackground(Color.WHITE);
-                squareLabels[move.getX()][i].setText(Character.toString(move.getWord().charAt(i - move.getY())));
-                board.getBoard()[move.getX()][i].setSquareType(SquareType.CONTAINS_LETTER);
+            for(int i = move.getY(); i < move.getWord().length() + move.getY(); i++) {
+                if(move.getWord().charAt(i - move.getY()) != '*') {
+                    squares[move.getX()][i].setBackground(Color.WHITE);
+                    squareLabels[move.getX()][i].setText(Character.toString(move.getWord().charAt(i - move.getY())));
+                    board.getBoard()[move.getX()][i].setSquareType(SquareType.CONTAINS_LETTER);
+                    board.getBoard()[i][move.getY()].setValue(Character.toString(move.getWord().charAt(i - move.getX())));
+                }
             }
         }
+
+        updateLetterPanel(move.getPlayer());
+
     }
 
 }

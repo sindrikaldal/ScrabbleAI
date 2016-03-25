@@ -1,5 +1,10 @@
 package Board;
 
+import WordCollection.Letter;
+
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * Created by sindrikaldal on 23/03/16.
  */
@@ -11,9 +16,11 @@ public class Square {
     private boolean isAnchor;
     private int x;
     private int y;
+    private List<Letter> crossCheckSet;
 
     public Square(SquareType squareType, String value, int x, int y) {
         this.squareType = squareType;
+        this.crossCheckSet = new ArrayList<Letter>();
         this.value = value;
         this.isAnchor = false;
         this.x = x;
@@ -58,4 +65,8 @@ public class Square {
     public void setY(int y) {
         this.y = y;
     }
+
+    public List<Letter> getCrossCheckSet() { return crossCheckSet; }
+
+    public void setCrossCheckSet(List<Letter> crossCheckSet) { this.crossCheckSet = crossCheckSet; }
 }

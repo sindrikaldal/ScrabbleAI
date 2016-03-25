@@ -4,21 +4,21 @@ package WordCollection;
  * Created by sindrikaldal on 23/03/16.
  */
 public class Letter {
-    private char letter;
+    private String letter;
     private int value;
     private int instances;
 
-    public Letter(char letter, int value, int instances) {
+    public Letter(String letter, int value, int instances) {
         this.letter = letter;
         this.value = value;
         this.instances = instances;
     }
 
-    public char getLetter() {
+    public String getLetter() {
         return letter;
     }
 
-    public void setLetter(char letter) {
+    public void setLetter(String letter) {
         this.letter = letter;
     }
 
