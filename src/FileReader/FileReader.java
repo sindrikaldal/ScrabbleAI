@@ -29,7 +29,7 @@ public class FileReader {
             e.printStackTrace();
         }
         try {
-                lines = Files.readAllLines(Paths.get(uri), Charset.defaultCharset());
+                lines = Files.readAllLines(Paths.get(uri), Charset.forName("UTF-8"));
 
         } catch (IOException e) {
             e.printStackTrace();
