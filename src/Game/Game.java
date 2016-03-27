@@ -24,15 +24,15 @@ public class Game {
 
         wordCollection = new WordCollection();
         bag = new Bag(wordCollection.getLetters());
-        initalizePlayers();
         this.board = new Board(wordCollection);
+        initalizePlayers();
         gui = new ScrabbleGUI(this.board, playerOne, playerTwo);
 
         System.out.println("Done!");
     }
 
     private void initalizePlayers() {
-        playerOne = new HumanPlayer(bag, board);
+        playerOne = new AgentFresco(bag, board);
         playerTwo = new AgentFresco(bag, board);
     }
 

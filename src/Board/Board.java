@@ -4,7 +4,9 @@ import WordCollection.*;
 import Move.*;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
+import java.util.NoSuchElementException;
 
 /**
  * Created by sindrikaldal on 23/03/16.
@@ -140,13 +142,16 @@ public class Board {
 
     public Move findMoves(Square square, List<Letter> rack) {
         List<String> crossChecks = new ArrayList<String>();
-        crossChecks.addAll(findCrossCheckSets(square, Direction.HORIZONTAL));
-        crossChecks.addAll(findCrossCheckSets(square, Direction.VERTICAL));
+
+        crossChecks.addAll(findCrossCheckSets(square, Direction.HORIZONTAL, rack));
+        crossChecks.addAll(findCrossCheckSets(square, Direction.VERTICAL, rack));
 
         return null;
     }
 
-    public List<String> findCrossCheckSets(Square square, Direction direction) {
+    public List<String> findCrossCheckSets(Square square, Direction direction, List<Letter> rack) {
+        List<String> leftPermutations = findLeftPermutations(square, direction, rack);
+
         return null;
     }
 
@@ -172,4 +177,64 @@ public class Board {
         }
     }
 
+    public List<String> findLeftPermutations(Square square, Direction direction, List<Letter> rack) {
+
+        List<String> permutations = new ArrayList<String>();
+
+        int maxLeft = 0;
+
+        if(direction.equals(Direction.HORIZONTAL)) {
+            Square leftSquare = null;
+            if(square.getY() > 0) {
+                leftSquare = board[square.getX()][square.getY() - 1];
+            }
+            while(leftSquare != null && leftSquare.getY() > 0 && !leftSquare.isAnchor()) {
+                maxLeft++;
+                leftSquare = board[leftSquare.getX()][leftSquare.getY() - 1];
+            }
+            if(!leftSquare.isAnchor() && !leftSquare.getSquareType().equals(SquareType.CONTAINS_LETTER)) {
+                maxLeft++;
+            }
+
+            permutation("", rack, permutations, maxLeft);
+            return permutations;
+        }
+        else {
+            Square leftSquare = null;
+            if(square.getY() > 0) {
+                leftSquare = board[square.getX()][square.getY() - 1];
+            }
+            while(leftSquare != null && leftSquare.getY() > 0 && !leftSquare.isAnchor()) {
+                maxLeft++;
+                leftSquare = board[leftSquare.getX() - 1][leftSquare.getY()];
+            }
+            if(!leftSquare.isAnchor() && !leftSquare.getSquareType().equals(SquareType.CONTAINS_LETTER)) {
+                maxLeft++;
+            }
+
+            permutation("", rack, permutations, maxLeft);
+            return permutations;
+        }
+    }
+
+    private void permutation(String prefix, List<Letter> rack, List<String> permutations, int maxLeft) {
+
+        if(prefix.length() <= maxLeft) {
+            int n = rack.size();
+            int numberOfWords = 0;
+
+
+            Iterable<String> startingWith = wordCollection.getDawg().getStringsStartingWith(prefix.toLowerCase());
+
+            if (startingWith.iterator().hasNext() && prefix.length() > 0) {
+                permutations.add(prefix);
+            }
+
+            for (int i = 0; i < n; i++) {
+                if(i < rack.size()) {
+                    permutation(prefix + rack.get(i).getLetter(), rack.subList(i + 1, rack.size()), permutations, maxLeft);
+                }
+            }
+        }
+    }
 }

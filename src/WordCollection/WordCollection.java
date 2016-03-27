@@ -13,7 +13,7 @@ public class WordCollection {
     private FileReader fileReader;
     private ArrayList<Letter> letters;
 
-    private static ModifiableDAWGSet dawg;
+    private ModifiableDAWGSet dawg;
 
     public WordCollection() {
 
@@ -28,8 +28,8 @@ public class WordCollection {
 
     private void importWordCollection() {
         // Comment this out for faster debugging!
-//        fileReader.storeWordCollection();
-//        dawg.addAll(fileReader.getLines());
+        fileReader.storeWordCollection();
+        dawg.addAll(fileReader.getLines());
     }
 
     private void initalizeLetters() {
@@ -81,5 +81,13 @@ public class WordCollection {
         }
 
         return 0;
+    }
+
+    public ModifiableDAWGSet getDawg() {
+        return dawg;
+    }
+
+    public void setDawg(ModifiableDAWGSet dawg) {
+        dawg = dawg;
     }
 }

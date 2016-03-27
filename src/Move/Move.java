@@ -1,7 +1,10 @@
 package Move;
 
+import Board.Square;
 import Player.Player;
 import WordCollection.*;
+
+import java.util.List;
 
 /**
  * Created by sindrikaldal on 24/03/16.
@@ -12,6 +15,7 @@ public class Move {
     int x, y;
     Direction direction;
     String word;
+    List<Square> squares;
 
     public Move(Player player, int x, int y, Direction direction, String word) {
         this.player = player;
