@@ -257,10 +257,42 @@ public class Board {
     }
 
     private String leftWord(Square square, Direction direction) {
-
+        if(square.getSquareType() != SquareType.CONTAINS_LETTER) {
+            return "";
+        }
+        if(direction.equals(Direction.HORIZONTAL)) {
+            if(square.getX() > 0) {
+                return leftWord(board[square.getX() - 1][square.getY()], Direction.HORIZONTAL) + square.getValue();
+            } else {
+                return "";
+            }
+        } else if(direction.equals(Direction.VERTICAL)) {
+            if(square.getY() > 0) {
+                return leftWord(board[square.getX()][square.getY() - 1], Direction.VERTICAL) + square.getValue();
+            } else {
+                return "";
+            }
+        }
+        return "";
     }
 
     private String rightWord(Square square, Direction direction) {
-
+        if(square.getSquareType() != SquareType.CONTAINS_LETTER) {
+            return "";
+        }
+        if(direction.equals(Direction.HORIZONTAL)) {
+            if(square.getX() < BOARD_SIZE - 1) {
+                return  square.getValue() + leftWord(board[square.getX() + 1][square.getY()], Direction.HORIZONTAL);
+            } else {
+                return "";
+            }
+        } else if(direction.equals(Direction.VERTICAL)) {
+            if(square.getY() < BOARD_SIZE - 1) {
+                return square.getValue() + leftWord(board[square.getX()][square.getY() + 1], Direction.VERTICAL);
+            } else {
+                return "";
+            }
+        }
+        return "";
     }
 }
