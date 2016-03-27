@@ -46,16 +46,16 @@ public class Game {
 
 
             /* Update the anchors of the board */
-            board.updateAnchors();
-
-            /* Player's two turn*/
-            Move playerTwoMove = playerTwo.makeMove();
-            playerTwo.fillRack(bag);
-            gui.updateBoard(playerTwoMove);
-
-
-            /* Update the anchors of the board */
-            board.updateAnchors();
+//            board.updateAnchors();
+//
+//            /* Player's two turn*/
+//            Move playerTwoMove = playerTwo.makeMove();
+//            playerTwo.fillRack(bag);
+//            gui.updateBoard(playerTwoMove);
+//
+//
+//            /* Update the anchors of the board */
+//            board.updateAnchors();
         }
     }
 }

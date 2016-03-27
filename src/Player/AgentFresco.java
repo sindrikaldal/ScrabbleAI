@@ -72,12 +72,12 @@ public class AgentFresco implements Player {
         for(int i = 0; i < board.getBoardSize(); i++) {
             for(int j = 0; j < board.getBoardSize(); j++) {
                 if(board.getBoard()[i][j].isAnchor()) {
-                    moves.add(board.findMoves(board.getBoard()[i][j], rack));
+                    moves.addAll(board.findMoves(board.getBoard()[i][j], rack, this));
                 }
             }
         }
 
-        return bestMove(moves);
+        return moves.get(0);
     }
 
     @Override

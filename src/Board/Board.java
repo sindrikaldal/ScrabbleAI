@@ -2,6 +2,7 @@ package Board;
 
 import WordCollection.*;
 import Move.*;
+import Player.Player;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -140,7 +141,7 @@ public class Board {
         return false;
     }
 
-    public List<Move> findMoves(Square square, List<Letter> rack) {
+    public List<Move> findMoves(Square square, List<Letter> rack, Player player) {
 
         List<Move> moves = new ArrayList<Move>();
         List<String> leftPermutationsHoriztonal = findLeftPermutations(square, Direction.HORIZONTAL, rack);
@@ -149,10 +150,10 @@ public class Board {
 
         for(String s : leftPermutationsHoriztonal) {
             List<Letter> remainingRack = remainingRack(rack, s);
-            extendRight(square, remainingRack, moves);
+            extendRight(square, remainingRack, moves, s, player, Direction.HORIZONTAL);
         }
 
-        return null;
+        return moves;
     }
 
     public void findCrossCheckSets(List<Letter> rack) {
@@ -238,7 +239,7 @@ public class Board {
             if(square.getY() > 0) {
                 leftSquare = board[square.getX()][square.getY() - 1];
             }
-            while(leftSquare != null && leftSquare.getY() > 0 && !leftSquare.isAnchor()) {
+            while(leftSquare != null && leftSquare.getX() > 0 && !leftSquare.isAnchor()) {
                 maxLeft++;
                 leftSquare = board[leftSquare.getX() - 1][leftSquare.getY()];
             }
@@ -312,11 +313,11 @@ public class Board {
 
     private List<Letter> remainingRack(List<Letter> rack, String word) {
 
-        List<Letter> remainingRack = new ArrayList<Letter>();
+        List<Letter> remainingRack = rack;
         for(int i = 0; i < word.length(); i++) {
-            for(Letter l : rack) {
+            for(Letter l : remainingRack) {
                 if(l.getLetter().equals(Character.toString(word.charAt(i)).toUpperCase())) {
-                    remainingRack.add(l);
+                    remainingRack.remove(l);
                     break;
                 }
             }
@@ -324,7 +325,34 @@ public class Board {
         return remainingRack;
     }
 
-    private void extendRight(Square square, List<Letter> remainingRack, List<Move> moves) {
-        
+    private void extendRight(Square square, List<Letter> remainingRack, List<Move> moves, String word, Player player, Direction direction) {
+        for(Letter l : square.getCrossCheckSet()) {
+            if(wordCollection.getDawg().contains((word + l.getLetter()).toLowerCase()) && remainingRack.contains(l)) {
+                if(direction.equals(Direction.HORIZONTAL)) {
+                    new Move(player, square.getX(), square.getY() - word.length(), direction, word + l.getLetter());
+                }
+                else {
+                    new Move(player, square.getX() - word.length(), square.getY(), direction, word + l.getLetter());
+                }
+            }
+            else if(wordCollection.getDawg().getStringsStartingWith((word + l.getLetter()).toLowerCase()).iterator().hasNext() && remainingRack.contains(l)){
+                if(direction.equals(Direction.HORIZONTAL)) {
+                    if(square.getY() < BOARD_SIZE - 1) {
+                        extendRight(board[square.getX()][square.getY() + 1], remainingRack(remainingRack, l.getLetter()), moves, word + l.getLetter(), player, direction);
+                    }
+                    else {
+                        return;
+                    }
+                }
+                else {
+                    if(square.getX() < BOARD_SIZE - 1) {
+                        extendRight(board[square.getX() + 1][square.getY()], remainingRack(remainingRack, l.getLetter()), moves, word + l.getLetter(), player, direction);
+                    }
+                    else {
+                        return;
+                    }
+                }
+            }
+        }
     }
 }
