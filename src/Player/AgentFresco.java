@@ -19,8 +19,6 @@ public class AgentFresco implements Player {
     private List<Integer> scoreHistory;
     private Board board;
     private int totalScore;
-    private Move nextMove;
-
 
     public AgentFresco(Bag bag, Board board) {
         this.scoreHistory = new ArrayList<Integer>();
@@ -28,7 +26,6 @@ public class AgentFresco implements Player {
         this.totalScore = 0;
         this.board = board;
         fillRack(bag);
-        nextMove = null;
     }
 
     //region getters and setters
@@ -79,7 +76,8 @@ public class AgentFresco implements Player {
                 }
             }
         }
-        return null;
+
+        return bestMove(moves);
     }
 
     @Override
@@ -110,8 +108,17 @@ public class AgentFresco implements Player {
         }
     }
 
-    public void checkBestMove(Move move) {
+    public Move bestMove(List<Move> moves) {
 
+        Move bestMove = null;
+
+        for(Move m : moves) {
+            if(bestMove == null || bestMove.score() < m.score()) {
+                bestMove = m;
+            }
+        }
+
+        return bestMove;
     }
 
 }

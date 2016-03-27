@@ -140,10 +140,17 @@ public class Board {
         return false;
     }
 
-    public Move findMoves(Square square, List<Letter> rack) {
+    public List<Move> findMoves(Square square, List<Letter> rack) {
 
+        List<Move> moves = new ArrayList<Move>();
         List<String> leftPermutationsHoriztonal = findLeftPermutations(square, Direction.HORIZONTAL, rack);
         List<String> leftPermutationsVertical = findLeftPermutations(square, Direction.VERTICAL, rack);
+
+
+        for(String s : leftPermutationsHoriztonal) {
+            List<Letter> remainingRack = remainingRack(rack, s);
+            extendRight(square, remainingRack, moves);
+        }
 
         return null;
     }
@@ -153,23 +160,32 @@ public class Board {
         for (int i = 0; i < BOARD_SIZE; i++) {
             for (int j = 0; j < BOARD_SIZE; j++) {
                 if(!board[i][j].getSquareType().equals(SquareType.CONTAINS_LETTER)) {
-                    String leftWordHorizontal = leftWord(board[i][j], Direction.HORIZONTAL);
-                    String rightWordHorizontal = rightWord(board[i][j], Direction.HORIZONTAL);
-                    String leftWordVertical = leftWord(board[i][j], Direction.VERTICAL);
-                    String rightWordVertical = rightWord(board[i][j], Direction.VERTICAL);
-
-                    for(Letter l : rack) {
-                        if(wordCollection.getDawg().contains(leftWordHorizontal + l.getLetter() + rightWordHorizontal)) {
-                            board[i][j].getCrossCheckSet().add(l);
-                        }
-                        if(wordCollection.getDawg().contains(leftWordVertical + l.getLetter() + rightWordVertical)) {
-                            board[i][j].getCrossCheckSet().add(l);
-                        }
+                    if(board[i][j].isAnchor()) {
+                        findCrossCheckSets(board[i][j], Direction.HORIZONTAL, rack);
+                        findCrossCheckSets(board[i][j], Direction.VERTICAL, rack);
                     }
                 }
             }
         }
 
+    }
+
+    private void findCrossCheckSets(Square square, Direction direction, List<Letter> rack) {
+        String leftWord = leftWord(square, direction);
+        String rightWord = rightWord(square, direction);
+
+        if(rightWord.equals("") && leftWord.equals("")) {
+            for(Letter l : rack) {
+                square.getCrossCheckSet().add(l);
+            }
+        }
+        else {
+            for(Letter l : rack) {
+                if(wordCollection.getDawg().contains(leftWord + l.getLetter() + rightWord)) {
+                    square.getCrossCheckSet().add(l);
+                }
+            }
+        }
     }
 
     /* After each player's turn, update the anchor squares. Anchor is an empty square next to a square that contains a letter */
@@ -239,8 +255,6 @@ public class Board {
 
         if(prefix.length() <= maxLeft) {
             int n = rack.size();
-            int numberOfWords = 0;
-
 
             Iterable<String> startingWith = wordCollection.getDawg().getStringsStartingWith(prefix.toLowerCase());
 
@@ -277,7 +291,7 @@ public class Board {
     }
 
     private String rightWord(Square square, Direction direction) {
-        if(square.getSquareType() != SquareType.CONTAINS_LETTER) {
+        if(!square.getSquareType().equals(SquareType.CONTAINS_LETTER)) {
             return "";
         }
         if(direction.equals(Direction.HORIZONTAL)) {
@@ -294,5 +308,23 @@ public class Board {
             }
         }
         return "";
+    }
+
+    private List<Letter> remainingRack(List<Letter> rack, String word) {
+
+        List<Letter> remainingRack = new ArrayList<Letter>();
+        for(int i = 0; i < word.length(); i++) {
+            for(Letter l : rack) {
+                if(l.getLetter().equals(Character.toString(word.charAt(i)).toUpperCase())) {
+                    remainingRack.add(l);
+                    break;
+                }
+            }
+        }
+        return remainingRack;
+    }
+
+    private void extendRight(Square square, List<Letter> remainingRack, List<Move> moves) {
+        
     }
 }

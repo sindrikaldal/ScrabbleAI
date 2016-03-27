@@ -3,6 +3,7 @@ package Move;
 import Board.Square;
 import Player.Player;
 import WordCollection.*;
+import Score.Score;
 
 import java.util.List;
 
@@ -16,6 +17,7 @@ public class Move {
     Direction direction;
     String word;
     List<Square> squares;
+    Score score;
 
     public Move(Player player, int x, int y, Direction direction, String word) {
         this.player = player;
@@ -23,6 +25,7 @@ public class Move {
         this.y = y;
         this.direction = direction;
         this.word = word;
+        score = new Score();
     }
 
     public Player getPlayer() {
@@ -67,12 +70,6 @@ public class Move {
 
     /* Calculate the score of the word */
     public int score() {
-        int score = 0;
-
-        for(int i = 0; i < word.length(); i++) {
-            score += new WordCollection().letterScore(Character.toString(word.charAt(i)));
-        }
-
-        return score;
+        return score.score(this);
     }
 }
