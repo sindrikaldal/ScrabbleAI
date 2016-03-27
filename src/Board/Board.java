@@ -141,24 +141,42 @@ public class Board {
     }
 
     public Move findMoves(Square square, List<Letter> rack) {
-        List<String> crossChecks = new ArrayList<String>();
 
-        crossChecks.addAll(findCrossCheckSets(square, Direction.HORIZONTAL, rack));
-        crossChecks.addAll(findCrossCheckSets(square, Direction.VERTICAL, rack));
+        List<String> leftPermutationsHoriztonal = findLeftPermutations(square, Direction.HORIZONTAL, rack);
+        List<String> leftPermutationsVertical = findLeftPermutations(square, Direction.VERTICAL, rack);
 
         return null;
     }
 
-    public List<String> findCrossCheckSets(Square square, Direction direction, List<Letter> rack) {
-        List<String> leftPermutations = findLeftPermutations(square, direction, rack);
+    public void findCrossCheckSets(List<Letter> rack) {
 
-        return null;
+        for (int i = 0; i < BOARD_SIZE; i++) {
+            for (int j = 0; j < BOARD_SIZE; j++) {
+                if(!board[i][j].getSquareType().equals(SquareType.CONTAINS_LETTER)) {
+                    String leftWordHorizontal = leftWord(board[i][j], Direction.HORIZONTAL);
+                    String rightWordHorizontal = rightWord(board[i][j], Direction.HORIZONTAL);
+                    String leftWordVertical = leftWord(board[i][j], Direction.VERTICAL);
+                    String rightWordVertical = rightWord(board[i][j], Direction.VERTICAL);
+
+                    for(Letter l : rack) {
+                        if(wordCollection.getDawg().contains(leftWordHorizontal + l.getLetter() + rightWordHorizontal)) {
+                            board[i][j].getCrossCheckSet().add(l);
+                        }
+                        if(wordCollection.getDawg().contains(leftWordVertical + l.getLetter() + rightWordVertical)) {
+                            board[i][j].getCrossCheckSet().add(l);
+                        }
+                    }
+                }
+            }
+        }
+
     }
 
     /* After each player's turn, update the anchor squares. Anchor is an empty square next to a square that contains a letter */
     public void updateAnchors() {
         for(int i = 0; i < BOARD_SIZE; i++) {
             for(int j = 0; j < BOARD_SIZE; j++) {
+                board[i][j].setAnchor(false);
                 if(board[i][j].getSquareType().equals(SquareType.CONTAINS_LETTER)) {
                     if(i < BOARD_SIZE - 1 && !board[i + 1][j].getSquareType().equals(SquareType.CONTAINS_LETTER)) {
                         board[i + 1][j].setAnchor(true);
@@ -236,5 +254,13 @@ public class Board {
                 }
             }
         }
+    }
+
+    private String leftWord(Square square, Direction direction) {
+
+    }
+
+    private String rightWord(Square square, Direction direction) {
+
     }
 }

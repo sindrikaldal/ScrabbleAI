@@ -68,6 +68,8 @@ public class AgentFresco implements Player {
     @Override
     public Move makeMove() {
 
+        board.findCrossCheckSets(rack);
+
         List<Move> moves = new ArrayList<Move>();
 
         for(int i = 0; i < board.getBoardSize(); i++) {
