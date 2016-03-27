@@ -15,4 +15,5 @@ public abstract interface Player {
     public Move makeMove ();
     public void fillRack(Bag bag);
     public List<Letter> getRack();
+    public void removeFromRack(String word);
 }

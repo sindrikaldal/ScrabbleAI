@@ -1,5 +1,11 @@
 package Board;
 
+import WordCollection.*;
+import Move.*;
+
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * Created by sindrikaldal on 23/03/16.
  */
@@ -7,8 +13,10 @@ public class Board {
 
     private int BOARD_SIZE = 15;
     private Square board[][];
+    private WordCollection wordCollection;
 
-    public Board() {
+    public Board(WordCollection wordCollection) {
+        this.wordCollection = wordCollection;
         initializeBoard();
     }
 
@@ -129,4 +137,39 @@ public class Board {
         }
         return false;
     }
+
+    public Move findMoves(Square square, List<Letter> rack) {
+        List<String> crossChecks = new ArrayList<String>();
+        crossChecks.addAll(findCrossCheckSets(square, Direction.HORIZONTAL));
+        crossChecks.addAll(findCrossCheckSets(square, Direction.VERTICAL));
+
+        return null;
+    }
+
+    public List<String> findCrossCheckSets(Square square, Direction direction) {
+        return null;
+    }
+
+    /* After each player's turn, update the anchor squares. Anchor is an empty square next to a square that contains a letter */
+    public void updateAnchors() {
+        for(int i = 0; i < BOARD_SIZE; i++) {
+            for(int j = 0; j < BOARD_SIZE; j++) {
+                if(board[i][j].getSquareType().equals(SquareType.CONTAINS_LETTER)) {
+                    if(i < BOARD_SIZE - 1 && !board[i + 1][j].getSquareType().equals(SquareType.CONTAINS_LETTER)) {
+                        board[i + 1][j].setAnchor(true);
+                    }
+                    if(i > 0 && !board[i - 1][j].getSquareType().equals(SquareType.CONTAINS_LETTER)) {
+                        board[i - 1][j].setAnchor(true);
+                    }
+                    if(j < BOARD_SIZE - 1 && !board[i][j + 1].getSquareType().equals(SquareType.CONTAINS_LETTER)) {
+                        board[i][j + 1].setAnchor(true);
+                    }
+                    if(j > 0 && !board[i][j - 1].getSquareType().equals(SquareType.CONTAINS_LETTER)) {
+                        board[i][j - 1].setAnchor(true);
+                    }
+                }
+            }
+        }
+    }
+
 }

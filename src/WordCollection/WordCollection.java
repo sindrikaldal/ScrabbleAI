@@ -70,4 +70,16 @@ public class WordCollection {
     public ArrayList<Letter> getLetters() {
         return letters;
     }
+
+    /* Return the value of the given letter */
+    public int letterScore(String letter) {
+
+        for(int i = 0; i < letters.size(); i++) {
+            if(letter.equals(letters.get(i).getLetter())) {
+                return letters.get(i).getValue();
+            }
+        }
+
+        return 0;
+    }
 }

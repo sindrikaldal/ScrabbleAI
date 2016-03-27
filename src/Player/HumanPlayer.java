@@ -12,18 +12,19 @@ import Game.Bag;
 
 public class HumanPlayer implements Player {
 
-    int MAX_TILES_ON_HAND = 7;
+    int RACK_COUNT = 7;
     private List<Letter> rack;
     private List<Integer> scoreHistory;
     private Board board;
     private int totalScore;
 
 
-    public HumanPlayer(Bag bag) {
+    public HumanPlayer(Bag bag, Board board) {
         this.scoreHistory = new ArrayList<Integer>();
         rack = new ArrayList<Letter>();
         this.totalScore = 0;
         fillRack(bag);
+        this.board = board;
     }
 
     //region getters and setters
@@ -38,7 +39,7 @@ public class HumanPlayer implements Player {
         this.totalScore += newScore;
     }
     public int getMAX_TILES_ON_HAND() {
-        return MAX_TILES_ON_HAND;
+        return RACK_COUNT;
     }
 
     public List<Integer> getScoreHistory() {
@@ -55,6 +56,11 @@ public class HumanPlayer implements Player {
 
     public void setBoard(Board board) {
         this.board = board;
+    }
+
+    @Override
+    public List<Letter> getRack() {
+        return rack;
     }
     //endregion getters an
 
@@ -89,18 +95,23 @@ public class HumanPlayer implements Player {
         return new Move(this, x, y, direction, wordToReturn);
     }
 
+
     @Override
+    /* Fill the rack with letters from the bag */
     public void fillRack(Bag bag) {
         Random random = new Random();
         int rackSize = rack.size();
-        for(int i = 0; i < (MAX_TILES_ON_HAND - rackSize); i++) {
+        for(int i = 0; i < (RACK_COUNT - rackSize); i++) {
             int randomNumber = random.nextInt(bag.getBag().size());
             rack.add(bag.getBag().get(randomNumber));
             bag.getBag().remove(randomNumber);
         }
     }
 
-    private void removeFromRack(String word) {
+
+    /* Remove the letters from the rack that were used to place down the word */
+    @Override
+    public void removeFromRack(String word) {
         for(int i = 0; i < word.length(); i++) {
             for(int j = 0; j < rack.size(); j++) {
                 if(rack.get(j).getLetter().equals(Character.toString(word.charAt(i)).toUpperCase())) {
@@ -112,9 +123,6 @@ public class HumanPlayer implements Player {
     }
 
 
-    @Override
-    public List<Letter> getRack() {
-        return rack;
-    }
+
 
 }

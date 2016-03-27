@@ -14,9 +14,10 @@ import java.util.List;
  */
 public class FileReader {
 
-    private List<String> lines = new ArrayList<String>();
+    private List<String> lines;
 
     public FileReader() {
+        lines = new ArrayList<String>();
     }
 
     public void storeWordCollection() {

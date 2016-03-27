@@ -1,6 +1,7 @@
 package Move;
 
 import Player.Player;
+import WordCollection.*;
 
 /**
  * Created by sindrikaldal on 24/03/16.
@@ -58,5 +59,16 @@ public class Move {
 
     public void setWord(String word) {
         this.word = word;
+    }
+
+    /* Calculate the score of the word */
+    public int score() {
+        int score = 0;
+
+        for(int i = 0; i < word.length(); i++) {
+            score += new WordCollection().letterScore(Character.toString(word.charAt(i)));
+        }
+
+        return score;
     }
 }

@@ -5,10 +5,6 @@ import WordCollection.Letter;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Created by sindrikaldal on 23/03/16.
- */
-
 public class Square {
 
     private SquareType squareType;
@@ -27,6 +23,8 @@ public class Square {
         this.y = y;
     }
 
+
+    //region getters and setters
     public SquareType getSquareType() {
         return squareType;
     }
@@ -42,9 +40,7 @@ public class Square {
     public void setValue(String value) {
         this.value = value;
     }
-    public boolean isAnchor() {
-        return isAnchor;
-    }
+    public boolean isAnchor() { return isAnchor; }
 
     public void setAnchor(boolean anchor) {
         isAnchor = anchor;
@@ -69,4 +65,7 @@ public class Square {
     public List<Letter> getCrossCheckSet() { return crossCheckSet; }
 
     public void setCrossCheckSet(List<Letter> crossCheckSet) { this.crossCheckSet = crossCheckSet; }
+    //endregion getters and setters
+
+
 }

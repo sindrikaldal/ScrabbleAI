@@ -13,6 +13,7 @@ public class Game {
     private ScrabbleGUI gui;
     private WordCollection wordCollection;
     private Bag bag;
+    private Board board;
 
     Player playerOne;
     Player playerTwo;
@@ -24,22 +25,37 @@ public class Game {
         wordCollection = new WordCollection();
         bag = new Bag(wordCollection.getLetters());
         initalizePlayers();
-        gui = new ScrabbleGUI(new Board(), playerOne, playerTwo);
+        this.board = new Board(wordCollection);
+        gui = new ScrabbleGUI(this.board, playerOne, playerTwo);
 
         System.out.println("Done!");
     }
 
     private void initalizePlayers() {
-        playerOne = new HumanPlayer(bag);
-        playerTwo = new AgentFresco(bag);
+        playerOne = new HumanPlayer(bag, board);
+        playerTwo = new AgentFresco(bag, board);
     }
 
     public void startGame() {
-        while(true) {
-            Move move = playerOne.makeMove();
-            playerOne.fillRack(bag);
-            gui.updateBoard(move);
+        while(bag.getBag().size() > 5) {
 
+            /* Player's one turn*/
+            Move playerOneMove = playerOne.makeMove();
+            playerOne.fillRack(bag);
+            gui.updateBoard(playerOneMove);
+
+
+            /* Update the anchors of the board */
+            board.updateAnchors();
+
+            /* Player's two turn*/
+            Move playerTwoMove = playerTwo.makeMove();
+            playerTwo.fillRack(bag);
+            gui.updateBoard(playerTwoMove);
+
+
+            /* Update the anchors of the board */
+            board.updateAnchors();
         }
     }
 }
