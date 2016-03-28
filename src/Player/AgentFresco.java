@@ -81,7 +81,7 @@ public class AgentFresco implements Player {
             }
         }
 
-        removeFromRack(bestMove.getWord());
+        removeFromRack(bestMove);
         scoreHistory.add(bestMove.getScore());
         totalScore += bestMove.getScore();
 
@@ -104,14 +104,24 @@ public class AgentFresco implements Player {
         return rack;
     }
 
-    @Override
-    public void removeFromRack(String word) {
-        for (int i = 0; i < word.length(); i++) {
+    public void removeFromRack(Move move) {
+        for (int i = 0; i < move.getWord().length(); i++) {
             for (int j = 0; j < rack.size(); j++) {
-                if (rack.get(j).getLetter().equals(Character.toString(word.charAt(i)).toUpperCase())) {
-                    rack.remove(j);
-                    break;
+                if(move.getDirection().equals(Direction.HORIZONTAL)) {
+                    if (rack.get(j).getLetter().equals(Character.toString(move.getWord().charAt(i)).toUpperCase()) &&
+                            !board.getBoard()[move.getX()][move.getY() + i].getSquareType().equals(SquareType.CONTAINS_LETTER)) {
+                        rack.remove(j);
+                        break;
+                    }
                 }
+                else {
+                    if (rack.get(j).getLetter().equals(Character.toString(move.getWord().charAt(i)).toUpperCase()) &&
+                            !board.getBoard()[move.getX() + i][move.getY()].getSquareType().equals(SquareType.CONTAINS_LETTER)) {
+                        rack.remove(j);
+                        break;
+                    }
+                }
+
             }
         }
     }
@@ -127,19 +137,19 @@ public class AgentFresco implements Player {
         for (int i = 0; i < board.getBoardSize(); i++) {
             for (int j = 0; j < board.getBoardSize(); j++) {
                 if (!board.getBoard()[i][j].getSquareType().equals(SquareType.CONTAINS_LETTER)) {
-                    if (board.getBoard()[i][j].isAnchor()) {
                         board.getBoard()[i][j].getCrossCheckSet().clear();
                         findCrossCheckSets(board.getBoard()[i][j], direction);
-                    }
                 }
             }
         }
     }
 
     private void findCrossCheckSets(Square square, Direction direction) {
+
         String leftWord = "";
         String rightWord = "";
-        if (direction.equals(Direction.HORIZONTAL)) {
+
+        if (direction.equals(Direction.VERTICAL)) {
             if (square.getY() > 0) {
                 leftWord = leftWord(board.getBoard()[square.getX()][square.getY() - 1], direction);
             }
@@ -154,23 +164,18 @@ public class AgentFresco implements Player {
                 rightWord = rightWord(board.getBoard()[square.getX() + 1][square.getY()], direction);
             }
         }
-//        if(rightWord.equals("") && leftWord.equals("")) {
-//            for(Letter l : rack) {
-//                if(direction.equals(Direction.HORIZONTAL)) {
-//                    square.getCrossCheckSetHorizontal().add(l);
-//                }else {
-//                    square.getCrossCheckSetVertical().add(l);
-//                }
-//            }
-//        }
-//        else {
-        for (Letter l : rack) {
-            if (board.getWordCollection().getDawg().contains((leftWord + l.getLetter() + rightWord).toLowerCase())) {
+        if(rightWord.equals("") && leftWord.equals("")) {
+            for(Letter l : rack) {
                 square.getCrossCheckSet().add(l);
             }
+         }
+        else {
+            for (Letter l : rack) {
+                if (board.getWordCollection().getDawg().contains((leftWord + l.getLetter() + rightWord).toLowerCase())) {
+                    square.getCrossCheckSet().add(l);
+                }
+            }
         }
-//    }
-
 }
 
 
@@ -184,79 +189,132 @@ public class AgentFresco implements Player {
 
         /* For every string we found, try to extend that word to the right*/
         for(String s : leftPermutations) {
+
             List<Letter> remainingRack = remainingRack(rack, s);
-            extendRight(square, remainingRack, s, Direction.HORIZONTAL);
+
+            Iterable<String> children = board.getWordCollection().getDawg().getStringsStartingWith(s);
+            extendRight(square, remainingRack, s, direction, children);
+
         }
     }
 
-    private void extendRight(Square square, List<Letter> remainingRack, String word, Direction direction) {
+    /* Try to complete the word given the left permutation */
+    private void extendRight(Square square, List<Letter> remainingRack, String word, Direction direction, Iterable<String> children) {
 
 
-        if(direction.equals(Direction.HORIZONTAL)) {
-            if(square.getSquareType().equals(SquareType.CONTAINS_LETTER)) {
-                if(board.getWordCollection().getDawg().contains((word + square.getValue()).toLowerCase()) &&
-                        !board.getBoard()[square.getX()][square.getY() +1].getSquareType().equals(SquareType.CONTAINS_LETTER)) {
-                    saveBestMove(new Move(this, square.getX(), square.getY() - word.length(), direction, word + square.getValue()));
-                }
-                else if(board.getWordCollection().getDawg().getStringsStartingWith((word + square.getValue()).toLowerCase()).iterator().hasNext()){
-                    if(square.getY() < board.getBoardSize() - 1) {
-                        extendRight(board.getBoard()[square.getX()][square.getY() + 1], remainingRack(remainingRack, square.getValue()), word + square.getValue(), direction);
-                    }
-                    else {
-                        return;
-                    }
-                }
-            }
-            else {
-                for(Letter l : square.getCrossCheckSet()) {
-                    if(board.getWordCollection().getDawg().contains((word + l.getLetter()).toLowerCase()) && remainingRack.contains(l)
-                            && !board.getBoard()[square.getX()][square.getY() +1].getSquareType().equals(SquareType.CONTAINS_LETTER)) {
-                        saveBestMove(new Move(this, square.getX(), square.getY() - word.length(), direction, word + l.getLetter()));
-                    }
-                    else if(board.getWordCollection().getDawg().getStringsStartingWith((word + l.getLetter()).toLowerCase()).iterator().hasNext() && remainingRack.contains(l)){
-                        if(square.getY() < board.getBoardSize() - 1) {
-                            extendRight(board.getBoard()[square.getX()][square.getY() + 1], remainingRack(remainingRack, l.getLetter()), word + l.getLetter(), direction);
-                        }
-                        else {
-                            return;
-                        }
-                    }
-                }
-            }
-        }
-        else {
-            if(square.getSquareType().equals(SquareType.CONTAINS_LETTER)) {
-                if(board.getWordCollection().getDawg().contains((word + square.getValue()).toLowerCase()) &&
-                        !board.getBoard()[square.getX() + 1][square.getY()].getSquareType().equals(SquareType.CONTAINS_LETTER)) {
-                    saveBestMove(new Move(this, square.getX() - word.length(), square.getY(), direction, word + square.getValue()));
-                }
-                else if(board.getWordCollection().getDawg().getStringsStartingWith((word + square.getValue()).toLowerCase()).iterator().hasNext()){
-                    if(square.getY() < board.getBoardSize() - 1) {
-                        extendRight(board.getBoard()[square.getX() + 1][square.getY()], remainingRack(remainingRack, square.getValue()), word + square.getValue(), direction);
-                    }
-                    else {
-                        return;
-                    }
-                }
-            }
-            else {
-                for(Letter l : square.getCrossCheckSet()) {
-                    if(board.getWordCollection().getDawg().contains((word + l.getLetter()).toLowerCase()) && remainingRack.contains(l) &&
-                            !board.getBoard()[square.getX() + 1][square.getY()].getSquareType().equals(SquareType.CONTAINS_LETTER)) {
-                        saveBestMove(new Move(this, square.getX() - word.length(), square.getY(), direction, word + l.getLetter()));
+          if(!square.getSquareType().equals(SquareType.CONTAINS_LETTER)) {
+              if(board.getWordCollection().getDawg().contains(word.toLowerCase())) {
+                  if(direction.equals(Direction.HORIZONTAL)) {
+                      saveBestMove(new Move(this, square.getX(), square.getY() - word.length(), direction, word + square.getValue()));
+                  }
+                  else {
+                      saveBestMove(new Move(this, square.getX() - (word.length()), square.getY(), direction, word + square.getValue()));
+                  }
+              }
+              for(String child : children) {
+                  for(Letter letter : remainingRack) {
+                      if(Character.toString(child.charAt(word.length())).toUpperCase().equals(letter.getLetter())) {
+                          if(remainingRack.contains(letter)) {
+                              if(direction.equals(Direction.HORIZONTAL)) {
+                                  if(square.getY() < board.getBoardSize() - 1) {
+                                      extendRight(board.getBoard()[square.getX()][square.getY() + 1], remainingRack(remainingRack, letter.getLetter()), word + letter.getLetter(),
+                                              direction, board.getWordCollection().getDawg().getStringsStartingWith(word + letter.getLetter()));
+                                  }
+                              }
+                              else {
+                                  if(square.getX() < board.getBoardSize() - 1) {
+                                      extendRight(board.getBoard()[square.getX() + 1][square.getY()], remainingRack(remainingRack, letter.getLetter()), word + letter.getLetter(),
+                                              direction, board.getWordCollection().getDawg().getStringsStartingWith(word + letter.getLetter()));
+                                  }
+                              }
+                          }
+                      }
+                  }
+              }
+          }
+          else {
+              if(board.getWordCollection().getDawg().getStringsStartingWith((word + square.getValue()).toLowerCase()).iterator().hasNext()) {
+                  if(direction.equals(Direction.HORIZONTAL)) {
+                      if(square.getY() < board.getBoardSize() - 1) {
+                          extendRight(board.getBoard()[square.getX()][square.getY() + 1], remainingRack(remainingRack, square.getValue()), word + square.getValue(),
+                                  direction, board.getWordCollection().getDawg().getStringsStartingWith(word + square.getValue()));
+                      }
+                  }
+                  else {
+                      if(square.getX() < board.getBoardSize() - 1) {
+                          extendRight(board.getBoard()[square.getX() + 1][square.getY()], remainingRack(remainingRack, square.getValue()), word + square.getValue(),
+                                  direction, board.getWordCollection().getDawg().getStringsStartingWith(word + square.getValue()));
+                      }
+                  }
+              }
+          }
 
-                    }
-                    else if(board.getWordCollection().getDawg().getStringsStartingWith((word + l.getLetter()).toLowerCase()).iterator().hasNext() && remainingRack.contains(l)){
-                        if(square.getX() < board.getBoardSize() - 1) {
-                            extendRight(board.getBoard()[square.getX() + 1][square.getY()], remainingRack(remainingRack, l.getLetter()), word + l.getLetter(), direction);
-                        }
-                        else {
-                            return;
-                        }
-                    }
-                }
-            }
-        }
+//        if(direction.equals(Direction.HORIZONTAL)) {
+//            /* If the current square contains a letter */
+//            if(square.getSquareType().equals(SquareType.CONTAINS_LETTER)) {
+//                if(board.getWordCollection().getDawg().contains((word + square.getValue()).toLowerCase()) &&
+//                        !board.getBoard()[square.getX()][square.getY() + 1].getSquareType().equals(SquareType.CONTAINS_LETTER)) {
+//                    saveBestMove(new Move(this, square.getX(), square.getY() - word.length(), direction, word + square.getValue()));
+//                    if(square.getY() < board.getBoardSize() - 1) {
+//                        extendRight(board.getBoard()[square.getX()][square.getY() + 1], remainingRack(remainingRack, square.getValue()), word + square.getValue(), direction);
+//                    }
+//
+//                }
+//                else if(board.getWordCollection().getDawg().getStringsStartingWith((word + square.getValue()).toLowerCase()).iterator().hasNext()){
+//                    if(square.getY() < board.getBoardSize() - 1) {
+//                        extendRight(board.getBoard()[square.getX()][square.getY() + 1], remainingRack(remainingRack, square.getValue()), word + square.getValue(), direction);
+//                    }
+//                }
+//            }
+//            else {
+//                for(Letter l : square.getCrossCheckSet()) {
+//                    if(board.getWordCollection().getDawg().contains((word + l.getLetter()).toLowerCase()) && remainingRack.contains(l)
+//                            && !board.getBoard()[square.getX()][square.getY() + 1].getSquareType().equals(SquareType.CONTAINS_LETTER)) {
+//                        saveBestMove(new Move(this, square.getX(), square.getY() - word.length(), direction, word + l.getLetter()));
+//                        if(square.getY() < board.getBoardSize() - 1) {
+//                            extendRight(board.getBoard()[square.getX()][square.getY() + 1], remainingRack(remainingRack, l.getLetter()), word + l.getLetter(), direction);
+//                        }
+//                    }
+//                    else if(board.getWordCollection().getDawg().getStringsStartingWith((word + l.getLetter()).toLowerCase()).iterator().hasNext() && remainingRack.contains(l)){
+//                        if(square.getY() < board.getBoardSize() - 1) {
+//                            extendRight(board.getBoard()[square.getX()][square.getY() + 1], remainingRack(remainingRack, l.getLetter()), word + l.getLetter(), direction);
+//                        }
+//                    }
+//                }
+//            }
+//        }
+//        else {
+//            if(square.getSquareType().equals(SquareType.CONTAINS_LETTER)) {
+//                if(board.getWordCollection().getDawg().contains((word + square.getValue()).toLowerCase()) &&
+//                        !board.getBoard()[square.getX() + 1][square.getY()].getSquareType().equals(SquareType.CONTAINS_LETTER)) {
+//                    saveBestMove(new Move(this, square.getX() - word.length(), square.getY(), direction, word + square.getValue()));
+//                    if(square.getY() < board.getBoardSize() - 1) {
+//                        extendRight(board.getBoard()[square.getX() + 1][square.getY()], remainingRack(remainingRack, square.getValue()), word + square.getValue(), direction);
+//                    }
+//                }
+//                else if(board.getWordCollection().getDawg().getStringsStartingWith((word + square.getValue()).toLowerCase()).iterator().hasNext()){
+//                    if(square.getY() < board.getBoardSize() - 1) {
+//                        extendRight(board.getBoard()[square.getX() + 1][square.getY()], remainingRack(remainingRack, square.getValue()), word + square.getValue(), direction);
+//                    }
+//                }
+//            }
+//            else {
+//                for(Letter l : square.getCrossCheckSet()) {
+//                    if(board.getWordCollection().getDawg().contains((word + l.getLetter()).toLowerCase()) && remainingRack.contains(l) &&
+//                            !board.getBoard()[square.getX() + 1][square.getY()].getSquareType().equals(SquareType.CONTAINS_LETTER)) {
+//                        saveBestMove(new Move(this, square.getX() - word.length(), square.getY(), direction, word + l.getLetter()));
+//                        if(square.getX() < board.getBoardSize() - 1) {
+//                            extendRight(board.getBoard()[square.getX() + 1][square.getY()], remainingRack(remainingRack, l.getLetter()), word + l.getLetter(), direction);
+//                        }
+//                    }
+//                    else if(board.getWordCollection().getDawg().getStringsStartingWith((word + l.getLetter()).toLowerCase()).iterator().hasNext() && remainingRack.contains(l)){
+//                        if(square.getX() < board.getBoardSize() - 1) {
+//                            extendRight(board.getBoard()[square.getX() + 1][square.getY()], remainingRack(remainingRack, l.getLetter()), word + l.getLetter(), direction);
+//                        }
+//                    }
+//                }
+//            }
+//        }
     }
 
     public List<String> findLeftPermutations(Square square, Direction direction, List<Letter> rack) {
@@ -270,11 +328,12 @@ public class AgentFresco implements Player {
             if(square.getY() > 0) {
                 leftSquare = board.getBoard()[square.getX()][square.getY() - 1];
             }
-            while(leftSquare != null && leftSquare.getY() > 0 && !leftSquare.isAnchor()) {
+            while(leftSquare != null && leftSquare.getY() > 0 && !leftSquare.isAnchor()
+                    && !leftSquare.getSquareType().equals(SquareType.CONTAINS_LETTER)) {
                 maxLeft++;
                 leftSquare = board.getBoard()[leftSquare.getX()][leftSquare.getY() - 1];
             }
-            if(!leftSquare.isAnchor() && !leftSquare.getSquareType().equals(SquareType.CONTAINS_LETTER)) {
+            if(leftSquare != null && !leftSquare.isAnchor() && !leftSquare.getSquareType().equals(SquareType.CONTAINS_LETTER)) {
                 maxLeft++;
             }
 
@@ -286,11 +345,12 @@ public class AgentFresco implements Player {
             if(square.getY() > 0) {
                 leftSquare = board.getBoard()[square.getX()][square.getY() - 1];
             }
-            while(leftSquare != null && leftSquare.getX() > 0 && !leftSquare.isAnchor()) {
+            while(leftSquare != null && leftSquare.getX() > 0 && !leftSquare.isAnchor()
+                    && !leftSquare.getSquareType().equals(SquareType.CONTAINS_LETTER)) {
                 maxLeft++;
                 leftSquare = board.getBoard()[leftSquare.getX() - 1][leftSquare.getY()];
             }
-            if(!leftSquare.isAnchor() && !leftSquare.getSquareType().equals(SquareType.CONTAINS_LETTER)) {
+            if(leftSquare != null && !leftSquare.isAnchor() && !leftSquare.getSquareType().equals(SquareType.CONTAINS_LETTER)) {
                 maxLeft++;
             }
 
@@ -374,7 +434,6 @@ public class AgentFresco implements Player {
         }
         return remainingRack;
     }
-
 
 
 }

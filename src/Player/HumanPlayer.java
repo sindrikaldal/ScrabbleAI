@@ -110,7 +110,7 @@ public class HumanPlayer implements Player {
 
 
     /* Remove the letters from the rack that were used to place down the word */
-    @Override
+
     public void removeFromRack(String word) {
         for(int i = 0; i < word.length(); i++) {
             for(int j = 0; j < rack.size(); j++) {

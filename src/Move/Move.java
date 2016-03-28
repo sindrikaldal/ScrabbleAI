@@ -5,6 +5,7 @@ import Player.Player;
 import WordCollection.*;
 import Score.Score;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -16,7 +17,7 @@ public class Move {
     int x, y;
     Direction direction;
     String word;
-    List<Square> squares;
+    List<Letter> lettersUsed;
     int score;
 
     public Move(Player player, int x, int y, Direction direction, String word) {
@@ -26,8 +27,10 @@ public class Move {
         this.direction = direction;
         this.word = word;
         score = new Score(player).score(this);
+        lettersUsed = new ArrayList<Letter>();
     }
 
+    //region getters and setters
     public Player getPlayer() { return player; }
 
     public void setPlayer(Player player) {
@@ -70,4 +73,13 @@ public class Move {
     }
 
     public void setScore(int score) { this.score = score; }
+
+    public List<Letter> getLettersUsed() {
+        return lettersUsed;
+    }
+
+    public void setLettersUsed(List<Letter> lettersUsed) {
+        this.lettersUsed = lettersUsed;
+    }
+    //endregion getters and setters
 }
