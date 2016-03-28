@@ -203,10 +203,10 @@ public class AgentFresco implements Player {
           if(!square.getSquareType().equals(SquareType.CONTAINS_LETTER)) {
               if(board.getWordCollection().getDawg().contains(word.toLowerCase()) && containsAnchor(word, square, direction)) {
                   if(direction.equals(Direction.HORIZONTAL)) {
-                      saveBestMove(new Move(this, square.getX(), square.getY() - (word.length()), direction, word + square.getValue()));
+                      saveBestMove(new Move(this, square.getX(), square.getY() - (word.length() + 1), direction, word + square.getValue()));
                   }
                   else {
-                      saveBestMove(new Move(this, square.getX() - (word.length()), square.getY(), direction, word + square.getValue()));
+                      saveBestMove(new Move(this, square.getX() - (word.length() + 1), square.getY(), direction, word + square.getValue()));
                   }
               }
               for(String child : children) {
