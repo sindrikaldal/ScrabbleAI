@@ -72,9 +72,9 @@ public class AgentFresco implements Player {
 
         List<Move> moves = new ArrayList<Move>();
 
-        for(int i = 0; i < board.getBoardSize(); i++) {
-            for(int j = 0; j < board.getBoardSize(); j++) {
-                if(board.getBoard()[i][j].isAnchor()) {
+        for (int i = 0; i < board.getBoardSize(); i++) {
+            for (int j = 0; j < board.getBoardSize(); j++) {
+                if (board.getBoard()[i][j].isAnchor()) {
                     findMoves(board.getBoard()[i][j], Direction.HORIZONTAL);
                     findMoves(board.getBoard()[i][j], Direction.VERTICAL);
                 }
@@ -92,7 +92,7 @@ public class AgentFresco implements Player {
     public void fillRack(Bag bag) {
         Random random = new Random();
         int rackSize = rack.size();
-        for(int i = 0; i < (MAX_TILES_ON_HAND - rackSize); i++) {
+        for (int i = 0; i < (MAX_TILES_ON_HAND - rackSize); i++) {
             int randomNumber = random.nextInt(bag.getBag().size());
             rack.add(bag.getBag().get(randomNumber));
             bag.getBag().remove(randomNumber);
@@ -106,9 +106,9 @@ public class AgentFresco implements Player {
 
     @Override
     public void removeFromRack(String word) {
-        for(int i = 0; i < word.length(); i++) {
-            for(int j = 0; j < rack.size(); j++) {
-                if(rack.get(j).getLetter().equals(Character.toString(word.charAt(i)).toUpperCase())) {
+        for (int i = 0; i < word.length(); i++) {
+            for (int j = 0; j < rack.size(); j++) {
+                if (rack.get(j).getLetter().equals(Character.toString(word.charAt(i)).toUpperCase())) {
                     rack.remove(j);
                     break;
                 }
@@ -117,10 +117,62 @@ public class AgentFresco implements Player {
     }
 
     public void saveBestMove(Move move) {
-        if(bestMove == null || bestMove.getScore() < move.getScore()) {
+        if (bestMove == null || bestMove.getScore() < move.getScore()) {
             bestMove = move;
         }
     }
+
+    public void findCrossCheckSets(Direction direction) {
+
+        for (int i = 0; i < board.getBoardSize(); i++) {
+            for (int j = 0; j < board.getBoardSize(); j++) {
+                if (!board.getBoard()[i][j].getSquareType().equals(SquareType.CONTAINS_LETTER)) {
+                    if (board.getBoard()[i][j].isAnchor()) {
+                        board.getBoard()[i][j].getCrossCheckSet().clear();
+                        findCrossCheckSets(board.getBoard()[i][j], direction);
+                    }
+                }
+            }
+        }
+    }
+
+    private void findCrossCheckSets(Square square, Direction direction) {
+        String leftWord = "";
+        String rightWord = "";
+        if (direction.equals(Direction.HORIZONTAL)) {
+            if (square.getY() > 0) {
+                leftWord = leftWord(board.getBoard()[square.getX()][square.getY() - 1], direction);
+            }
+            if (square.getY() < board.getBoardSize() - 1) {
+                rightWord = rightWord(board.getBoard()[square.getX()][square.getY() + 1], direction);
+            }
+        } else {
+            if (square.getX() > 0) {
+                leftWord = leftWord(board.getBoard()[square.getX() - 1][square.getY()], direction);
+            }
+            if (square.getX() < board.getBoardSize() - 1) {
+                rightWord = rightWord(board.getBoard()[square.getX() + 1][square.getY()], direction);
+            }
+        }
+//        if(rightWord.equals("") && leftWord.equals("")) {
+//            for(Letter l : rack) {
+//                if(direction.equals(Direction.HORIZONTAL)) {
+//                    square.getCrossCheckSetHorizontal().add(l);
+//                }else {
+//                    square.getCrossCheckSetVertical().add(l);
+//                }
+//            }
+//        }
+//        else {
+        for (Letter l : rack) {
+            if (board.getWordCollection().getDawg().contains((leftWord + l.getLetter() + rightWord).toLowerCase())) {
+                square.getCrossCheckSet().add(l);
+            }
+        }
+//    }
+
+}
+
 
     public void findMoves(Square square, Direction direction) {
 
@@ -142,7 +194,8 @@ public class AgentFresco implements Player {
 
         if(direction.equals(Direction.HORIZONTAL)) {
             if(square.getSquareType().equals(SquareType.CONTAINS_LETTER)) {
-                if(board.getWordCollection().getDawg().contains((word + square.getValue()).toLowerCase())) {
+                if(board.getWordCollection().getDawg().contains((word + square.getValue()).toLowerCase()) &&
+                        !board.getBoard()[square.getX()][square.getY() +1].getSquareType().equals(SquareType.CONTAINS_LETTER)) {
                     saveBestMove(new Move(this, square.getX(), square.getY() - word.length(), direction, word + square.getValue()));
                 }
                 else if(board.getWordCollection().getDawg().getStringsStartingWith((word + square.getValue()).toLowerCase()).iterator().hasNext()){
@@ -155,8 +208,9 @@ public class AgentFresco implements Player {
                 }
             }
             else {
-                for(Letter l : square.getCrossCheckSetHorizontal()) {
-                    if(board.getWordCollection().getDawg().contains((word + l.getLetter()).toLowerCase()) && remainingRack.contains(l)) {
+                for(Letter l : square.getCrossCheckSet()) {
+                    if(board.getWordCollection().getDawg().contains((word + l.getLetter()).toLowerCase()) && remainingRack.contains(l)
+                            && !board.getBoard()[square.getX()][square.getY() +1].getSquareType().equals(SquareType.CONTAINS_LETTER)) {
                         saveBestMove(new Move(this, square.getX(), square.getY() - word.length(), direction, word + l.getLetter()));
                     }
                     else if(board.getWordCollection().getDawg().getStringsStartingWith((word + l.getLetter()).toLowerCase()).iterator().hasNext() && remainingRack.contains(l)){
@@ -171,23 +225,38 @@ public class AgentFresco implements Player {
             }
         }
         else {
-            for(Letter l : square.getCrossCheckSetVertical()) {
-                if(board.getWordCollection().getDawg().contains((word + l.getLetter()).toLowerCase()) && remainingRack.contains(l)) {
-
-                    saveBestMove(new Move(this, square.getX() - word.length(), square.getY(), direction, word + l.getLetter()));
-
+            if(square.getSquareType().equals(SquareType.CONTAINS_LETTER)) {
+                if(board.getWordCollection().getDawg().contains((word + square.getValue()).toLowerCase()) &&
+                        !board.getBoard()[square.getX() + 1][square.getY()].getSquareType().equals(SquareType.CONTAINS_LETTER)) {
+                    saveBestMove(new Move(this, square.getX() - word.length(), square.getY(), direction, word + square.getValue()));
                 }
-                else if(board.getWordCollection().getDawg().getStringsStartingWith((word + l.getLetter()).toLowerCase()).iterator().hasNext() && remainingRack.contains(l)){
-                    if(square.getX() < board.getBoardSize() - 1) {
-                        extendRight(board.getBoard()[square.getX() + 1][square.getY()], remainingRack(remainingRack, l.getLetter()), word + l.getLetter(), direction);
+                else if(board.getWordCollection().getDawg().getStringsStartingWith((word + square.getValue()).toLowerCase()).iterator().hasNext()){
+                    if(square.getY() < board.getBoardSize() - 1) {
+                        extendRight(board.getBoard()[square.getX() + 1][square.getY()], remainingRack(remainingRack, square.getValue()), word + square.getValue(), direction);
                     }
                     else {
                         return;
                     }
                 }
             }
-        }
+            else {
+                for(Letter l : square.getCrossCheckSet()) {
+                    if(board.getWordCollection().getDawg().contains((word + l.getLetter()).toLowerCase()) && remainingRack.contains(l) &&
+                            !board.getBoard()[square.getX() + 1][square.getY()].getSquareType().equals(SquareType.CONTAINS_LETTER)) {
+                        saveBestMove(new Move(this, square.getX() - word.length(), square.getY(), direction, word + l.getLetter()));
 
+                    }
+                    else if(board.getWordCollection().getDawg().getStringsStartingWith((word + l.getLetter()).toLowerCase()).iterator().hasNext() && remainingRack.contains(l)){
+                        if(square.getX() < board.getBoardSize() - 1) {
+                            extendRight(board.getBoard()[square.getX() + 1][square.getY()], remainingRack(remainingRack, l.getLetter()), word + l.getLetter(), direction);
+                        }
+                        else {
+                            return;
+                        }
+                    }
+                }
+            }
+        }
     }
 
     public List<String> findLeftPermutations(Square square, Direction direction, List<Letter> rack) {
@@ -306,68 +375,6 @@ public class AgentFresco implements Player {
         return remainingRack;
     }
 
-    public void findCrossCheckSets(Direction direction) {
-
-        for (int i = 0; i < board.getBoardSize(); i++) {
-            for (int j = 0; j < board.getBoardSize(); j++) {
-                if(!board.getBoard()[i][j].getSquareType().equals(SquareType.CONTAINS_LETTER)) {
-                    if(board.getBoard()[i][j].isAnchor()) {
-                        if(direction.equals(Direction.HORIZONTAL)) {
-                            board.getBoard()[i][j].setCrossCheckSetHorizontal(new ArrayList<Letter>());
-                            findCrossCheckSets(board.getBoard()[i][j], Direction.HORIZONTAL, rack);
-                        }
-                        else {
-                            board.getBoard()[i][j].setCrossCheckSetVertical(new ArrayList<Letter>());
-                            findCrossCheckSets(board.getBoard()[i][j], Direction.HORIZONTAL, rack);
-                        }
-
-                    }
-                }
-            }
-        }
-
-    }
-
-    private void findCrossCheckSets(Square square, Direction direction, List<Letter> rack) {
-        String leftWord = "";
-        String rightWord = "";
-        if(direction.equals(Direction.HORIZONTAL)) {
-            if(square.getY() > 0) {
-                leftWord = leftWord(board.getBoard()[square.getX()][square.getY() - 1], direction);
-            }
-            if(square.getY() < board.getBoardSize() - 1) {
-                rightWord = rightWord(board.getBoard()[square.getX()][square.getY() + 1], direction);
-            }
-        }
-        else {
-            if(square.getX() > 0) {
-                leftWord = leftWord(board.getBoard()[square.getX() - 1][square.getY()], direction);
-            }
-            if(square.getX() < board.getBoardSize() - 1) {
-                rightWord = rightWord(board.getBoard()[square.getX() + 1][square.getY()], direction);
-            }
-        }
-        if(rightWord.equals("") && leftWord.equals("")) {
-            for(Letter l : rack) {
-                if(direction.equals(Direction.HORIZONTAL)) {
-                    square.getCrossCheckSetHorizontal().add(l);
-                }else {
-                    square.getCrossCheckSetVertical().add(l);
-                }
-            }
-        }
-        else {
-            for(Letter l : rack) {
-                if(board.getWordCollection().getDawg().contains((leftWord + l.getLetter() + rightWord).toLowerCase())) {
-                    if(direction.equals(Direction.HORIZONTAL)) {
-                        square.getCrossCheckSetHorizontal().add(l);
-                    }else {
-                        square.getCrossCheckSetVertical().add(l);
-                    }
-                }
-            }
-        }
-    }
 
 
 }
