@@ -197,7 +197,7 @@ public class ScrabbleGUI extends JFrame {
                     squares[move.getX()][i].setBackground(Color.WHITE);
                     squareLabels[move.getX()][i].setText(Character.toString(move.getWord().charAt(i - move.getY())));
                     board.getBoard()[move.getX()][i].setSquareType(SquareType.CONTAINS_LETTER);
-                    board.getBoard()[i][move.getY()].setValue(Character.toString(move.getWord().charAt(i - move.getX())));
+                    board.getBoard()[move.getX()][i].setValue(Character.toString(move.getWord().charAt(i - move.getY())));
                 }
             }
         }

@@ -13,7 +13,6 @@ public class Square {
     private int x;
     private int y;
     private List<Letter> crossCheckSet;
-
     public Square(SquareType squareType, String value, int x, int y) {
         this.squareType = squareType;
         this.crossCheckSet = new ArrayList<Letter>();
@@ -62,9 +61,14 @@ public class Square {
         this.y = y;
     }
 
-    public List<Letter> getCrossCheckSet() { return crossCheckSet; }
+    public List<Letter> getCrossCheckSet() {
+        return crossCheckSet;
+    }
 
-    public void setCrossCheckSet(List<Letter> crossCheckSet) { this.crossCheckSet = crossCheckSet; }
+    public void setCrossCheckSet(List<Letter> crossCheckSet) {
+        this.crossCheckSet = crossCheckSet;
+    }
+
     //endregion getters and setters
 
 

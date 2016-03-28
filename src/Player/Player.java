@@ -3,6 +3,7 @@ package Player;
 import Game.Bag;
 import Move.Move;
 import WordCollection.Letter;
+import Board.Board;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -16,4 +17,5 @@ public abstract interface Player {
     public void fillRack(Bag bag);
     public List<Letter> getRack();
     public void removeFromRack(String word);
+    public Board getBoard();
 }
