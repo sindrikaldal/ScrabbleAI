@@ -37,8 +37,12 @@ public class Game {
     }
 
     public void startGame() {
+        int i = 0;
         while(bag.getBag().size() > 5) {
 
+            if(i == 5) {
+                return;
+            }
             /* Player's one turn*/
             Move playerOneMove = playerOne.makeMove();
             playerOne.fillRack(bag);
@@ -56,6 +60,7 @@ public class Game {
 
             /* Update the anchors of the board */
             board.updateAnchors();
+            i++;
         }
     }
 }
