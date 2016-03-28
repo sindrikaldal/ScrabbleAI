@@ -78,7 +78,6 @@ public class AgentFresco implements Player {
                 }
             }
         }
-
         removeFromRack(bestMove);
         scoreHistory.add(bestMove.getScore());
         totalScore += bestMove.getScore();
@@ -184,12 +183,10 @@ public class AgentFresco implements Player {
         List<String> leftPermutations = findLeftPermutations(square, direction, rack);
         //List<String> leftPermutationsVertical = findLeftPermutations(square, Direction.VERTICAL, rack);
 
-
         /* For every string we found, try to extend that word to the right*/
         for(String s : leftPermutations) {
-
             List<Letter> remainingRack = remainingRack(rack, s);
-
+            // viljum við ekki leita að orðum sem byrja á s + anchorinn þar sem við erum?
             Iterable<String> children = board.getWordCollection().getDawg().getStringsStartingWith(s);
             extendRight(square, remainingRack, s, direction, children);
 
@@ -198,8 +195,7 @@ public class AgentFresco implements Player {
 
     /* Try to complete the word given the left permutation */
     private void extendRight(Square square, List<Letter> remainingRack, String word, Direction direction, Iterable<String> children) {
-
-
+            // erum við ekki alltaf að skoða tóma reiti? finnst eins og við skoðum aldrei reiti sem innihalda staf?
           if(!square.getSquareType().equals(SquareType.CONTAINS_LETTER)) {
               if(board.getWordCollection().getDawg().contains(word.toLowerCase()) && containsAnchor(word, square, direction)) {
                   if(direction.equals(Direction.HORIZONTAL)) {
