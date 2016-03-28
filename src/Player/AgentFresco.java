@@ -70,8 +70,6 @@ public class AgentFresco implements Player {
 
         bestMove = null;
 
-        List<Move> moves = new ArrayList<Move>();
-
         for (int i = 0; i < board.getBoardSize(); i++) {
             for (int j = 0; j < board.getBoardSize(); j++) {
                 if (board.getBoard()[i][j].isAnchor()) {
@@ -203,9 +201,9 @@ public class AgentFresco implements Player {
 
 
           if(!square.getSquareType().equals(SquareType.CONTAINS_LETTER)) {
-              if(board.getWordCollection().getDawg().contains(word.toLowerCase())) {
+              if(board.getWordCollection().getDawg().contains(word.toLowerCase()) && containsAnchor(word, square, direction)) {
                   if(direction.equals(Direction.HORIZONTAL)) {
-                      saveBestMove(new Move(this, square.getX(), square.getY() - word.length(), direction, word + square.getValue()));
+                      saveBestMove(new Move(this, square.getX(), square.getY() - (word.length()), direction, word + square.getValue()));
                   }
                   else {
                       saveBestMove(new Move(this, square.getX() - (word.length()), square.getY(), direction, word + square.getValue()));
@@ -214,7 +212,7 @@ public class AgentFresco implements Player {
               for(String child : children) {
                   for(Letter letter : remainingRack) {
                       if(Character.toString(child.charAt(word.length())).toUpperCase().equals(letter.getLetter())) {
-                          if(remainingRack.contains(letter)) {
+                          if(square.getCrossCheckSet().contains(letter)) {
                               if(direction.equals(Direction.HORIZONTAL)) {
                                   if(square.getY() < board.getBoardSize() - 1) {
                                       extendRight(board.getBoard()[square.getX()][square.getY() + 1], remainingRack(remainingRack, letter.getLetter()), word + letter.getLetter(),
@@ -317,6 +315,26 @@ public class AgentFresco implements Player {
 //        }
     }
 
+    public boolean containsAnchor(String word, Square square, Direction direction) {
+
+        if(direction.equals(Direction.HORIZONTAL)) {
+            for(int i = 1; i < word.length(); i++) {
+                if(board.getBoard()[square.getX()][square.getY() - i].isAnchor()) {
+                    return true;
+                }
+            }
+            return false;
+        }
+        else {
+            for(int i = 1; i < word.length(); i++) {
+                if(board.getBoard()[square.getX() - i][square.getY()].isAnchor()) {
+                    return true;
+                }
+            }
+            return false;
+        }
+    }
+
     public List<String> findLeftPermutations(Square square, Direction direction, List<Letter> rack) {
 
         List<String> permutations = new ArrayList<String>();
@@ -382,40 +400,38 @@ public class AgentFresco implements Player {
         if(square.getValue().equals("")) {
             return "";
         }
-        if(direction.equals(Direction.HORIZONTAL)) {
+        if(direction.equals(Direction.VERTICAL)) {
             if(square.getY() > 0) {
-                return leftWord(board.getBoard()[square.getX()][square.getY() - 1], Direction.HORIZONTAL) + square.getValue();
+                return leftWord(board.getBoard()[square.getX()][square.getY() - 1], direction) + square.getValue();
             } else {
                 return "";
             }
-        } else if(direction.equals(Direction.VERTICAL)) {
+        } else {
             if(square.getX() > 0) {
-                return leftWord(board.getBoard()[square.getX() - 1][square.getY()], Direction.VERTICAL) + square.getValue();
+                return leftWord(board.getBoard()[square.getX() - 1][square.getY()], direction) + square.getValue();
             } else {
                 return "";
             }
         }
-        return "";
     }
 
     private String rightWord(Square square, Direction direction) {
         if(square.getValue().equals("")) {
             return "";
         }
-        if(direction.equals(Direction.HORIZONTAL)) {
+        if(direction.equals(Direction.VERTICAL)) {
             if(square.getY() < board.getBoardSize() - 1) {
-                return  square.getValue() + rightWord(board.getBoard()[square.getX()][square.getY() + 1], Direction.HORIZONTAL);
+                return  square.getValue() + rightWord(board.getBoard()[square.getX()][square.getY() + 1], direction);
             } else {
                 return "";
             }
-        } else if(direction.equals(Direction.VERTICAL)) {
+        } else {
             if(square.getX() < board.getBoardSize() - 1) {
-                return square.getValue() + rightWord(board.getBoard()[square.getX() + 1][square.getY()], Direction.VERTICAL);
+                return square.getValue() + rightWord(board.getBoard()[square.getX() + 1][square.getY()], direction);
             } else {
                 return "";
             }
         }
-        return "";
     }
 
     private List<Letter> remainingRack(List<Letter> rack, String word) {

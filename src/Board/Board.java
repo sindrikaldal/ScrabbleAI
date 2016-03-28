@@ -156,22 +156,24 @@ public class Board {
         for(int i = 0; i < BOARD_SIZE; i++) {
             for(int j = 0; j < BOARD_SIZE; j++) {
                 board[i][j].setAnchor(false);
-                if(board[i][j].getSquareType().equals(SquareType.CONTAINS_LETTER)) {
-                    if(i < BOARD_SIZE - 1 && !board[i + 1][j].getSquareType().equals(SquareType.CONTAINS_LETTER)) {
-                        board[i + 1][j].setAnchor(true);
+
+                if(!board[i][j].getSquareType().equals(SquareType.CONTAINS_LETTER)) {
+                    if(i < BOARD_SIZE - 1 && board[i + 1][j].getSquareType().equals(SquareType.CONTAINS_LETTER)) {
+                        board[i][j].setAnchor(true);
                     }
-                    if(i > 0 && !board[i - 1][j].getSquareType().equals(SquareType.CONTAINS_LETTER)) {
-                        board[i - 1][j].setAnchor(true);
+                    if(i > 0 && board[i - 1][j].getSquareType().equals(SquareType.CONTAINS_LETTER)) {
+                        board[i][j].setAnchor(true);
                     }
-                    if(j < BOARD_SIZE - 1 && !board[i][j + 1].getSquareType().equals(SquareType.CONTAINS_LETTER)) {
-                        board[i][j + 1].setAnchor(true);
+                    if(j < BOARD_SIZE - 1 && board[i][j + 1].getSquareType().equals(SquareType.CONTAINS_LETTER)) {
+                        board[i][j].setAnchor(true);
                     }
-                    if(j > 0 && !board[i][j - 1].getSquareType().equals(SquareType.CONTAINS_LETTER)) {
-                        board[i][j - 1].setAnchor(true);
+                    if(j > 0 && board[i][j - 1].getSquareType().equals(SquareType.CONTAINS_LETTER)) {
+                        board[i][j].setAnchor(true);
                     }
                 }
             }
         }
+
     }
 
 }
