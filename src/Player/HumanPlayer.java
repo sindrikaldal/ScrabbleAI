@@ -86,10 +86,11 @@ public class HumanPlayer implements Player {
             } else if (input.equals("V") || input.equals("v")){
                 direction = Direction.VERTICAL;
             }
-        } while(!(input.equals("H") || input.equals("h") || input.equals("V") || input.equals("v") || input.equals("v")));
+        } while(!(input.equals("H") || input.equals("h") || input.equals("V") || input.equals("v")));
 
         System.out.println("Input word to enter in field x:" + x + " y: " + y + " direction: " + direction);
         String wordToReturn = in.nextLine();
+        wordToReturn = wordToReturn.toUpperCase();
 
         removeFromRack(wordToReturn);
         return new Move(this, x, y, direction, wordToReturn);
