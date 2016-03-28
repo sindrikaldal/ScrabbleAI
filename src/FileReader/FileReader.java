@@ -21,7 +21,7 @@ public class FileReader {
     }
 
     public void storeWordCollection() {
-        String fileName = "ordmyndalisti3.txt";
+        String fileName = "ordmyndalisti.txt";
         URI uri = null;
         try {
             uri = this.getClass().getResource(fileName).toURI();
