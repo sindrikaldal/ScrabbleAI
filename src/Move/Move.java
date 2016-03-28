@@ -17,7 +17,7 @@ public class Move {
     Direction direction;
     String word;
     List<Square> squares;
-    Score score;
+    int score;
 
     public Move(Player player, int x, int y, Direction direction, String word) {
         this.player = player;
@@ -25,12 +25,10 @@ public class Move {
         this.y = y;
         this.direction = direction;
         this.word = word;
-        score = new Score();
+        score = new Score(player).score(this);
     }
 
-    public Player getPlayer() {
-        return player;
-    }
+    public Player getPlayer() { return player; }
 
     public void setPlayer(Player player) {
         this.player = player;
@@ -68,8 +66,8 @@ public class Move {
         this.word = word;
     }
 
-    /* Calculate the score of the word */
-    public int score() {
-        return score.score(this);
+    public int getScore() { return score;
     }
+
+    public void setScore(int score) { this.score = score; }
 }

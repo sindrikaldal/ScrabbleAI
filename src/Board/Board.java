@@ -115,6 +115,7 @@ public class Board {
         }
     }
 
+    //region getter and setters
     public int getBoardSize() {
         return BOARD_SIZE;
     }
@@ -122,6 +123,15 @@ public class Board {
     public Square[][] getBoard() {
         return board;
     }
+
+    public WordCollection getWordCollection() {
+        return wordCollection;
+    }
+
+    public void setWordCollection(WordCollection wordCollection) {
+        this.wordCollection = wordCollection;
+    }
+    //endregion getter and setters
 
     /* Check whether there are any squares adjacent to the given square that contain a letter */
     public boolean hasAdjacentSquares(Square square) {
@@ -139,54 +149,6 @@ public class Board {
             return true;
         }
         return false;
-    }
-
-    public List<Move> findMoves(Square square, List<Letter> rack, Player player) {
-
-        List<Move> moves = new ArrayList<Move>();
-        List<String> leftPermutationsHoriztonal = findLeftPermutations(square, Direction.HORIZONTAL, rack);
-        List<String> leftPermutationsVertical = findLeftPermutations(square, Direction.VERTICAL, rack);
-
-
-        for(String s : leftPermutationsHoriztonal) {
-            List<Letter> remainingRack = remainingRack(rack, s);
-            extendRight(square, remainingRack, moves, s, player, Direction.HORIZONTAL);
-        }
-
-        return moves;
-    }
-
-    public void findCrossCheckSets(List<Letter> rack) {
-
-        for (int i = 0; i < BOARD_SIZE; i++) {
-            for (int j = 0; j < BOARD_SIZE; j++) {
-                if(!board[i][j].getSquareType().equals(SquareType.CONTAINS_LETTER)) {
-                    if(board[i][j].isAnchor()) {
-                        findCrossCheckSets(board[i][j], Direction.HORIZONTAL, rack);
-                        findCrossCheckSets(board[i][j], Direction.VERTICAL, rack);
-                    }
-                }
-            }
-        }
-
-    }
-
-    private void findCrossCheckSets(Square square, Direction direction, List<Letter> rack) {
-        String leftWord = leftWord(square, direction);
-        String rightWord = rightWord(square, direction);
-
-        if(rightWord.equals("") && leftWord.equals("")) {
-            for(Letter l : rack) {
-                square.getCrossCheckSet().add(l);
-            }
-        }
-        else {
-            for(Letter l : rack) {
-                if(wordCollection.getDawg().contains(leftWord + l.getLetter() + rightWord)) {
-                    square.getCrossCheckSet().add(l);
-                }
-            }
-        }
     }
 
     /* After each player's turn, update the anchor squares. Anchor is an empty square next to a square that contains a letter */
@@ -212,147 +174,4 @@ public class Board {
         }
     }
 
-    public List<String> findLeftPermutations(Square square, Direction direction, List<Letter> rack) {
-
-        List<String> permutations = new ArrayList<String>();
-
-        int maxLeft = 0;
-
-        if(direction.equals(Direction.HORIZONTAL)) {
-            Square leftSquare = null;
-            if(square.getY() > 0) {
-                leftSquare = board[square.getX()][square.getY() - 1];
-            }
-            while(leftSquare != null && leftSquare.getY() > 0 && !leftSquare.isAnchor()) {
-                maxLeft++;
-                leftSquare = board[leftSquare.getX()][leftSquare.getY() - 1];
-            }
-            if(!leftSquare.isAnchor() && !leftSquare.getSquareType().equals(SquareType.CONTAINS_LETTER)) {
-                maxLeft++;
-            }
-
-            permutation("", rack, permutations, maxLeft);
-            return permutations;
-        }
-        else {
-            Square leftSquare = null;
-            if(square.getY() > 0) {
-                leftSquare = board[square.getX()][square.getY() - 1];
-            }
-            while(leftSquare != null && leftSquare.getX() > 0 && !leftSquare.isAnchor()) {
-                maxLeft++;
-                leftSquare = board[leftSquare.getX() - 1][leftSquare.getY()];
-            }
-            if(!leftSquare.isAnchor() && !leftSquare.getSquareType().equals(SquareType.CONTAINS_LETTER)) {
-                maxLeft++;
-            }
-
-            permutation("", rack, permutations, maxLeft);
-            return permutations;
-        }
-    }
-
-    private void permutation(String prefix, List<Letter> rack, List<String> permutations, int maxLeft) {
-
-        if(prefix.length() <= maxLeft) {
-            int n = rack.size();
-
-            Iterable<String> startingWith = wordCollection.getDawg().getStringsStartingWith(prefix.toLowerCase());
-
-            if (startingWith.iterator().hasNext() && prefix.length() > 0) {
-                permutations.add(prefix);
-            }
-
-            for (int i = 0; i < n; i++) {
-                if(i < rack.size()) {
-                    permutation(prefix + rack.get(i).getLetter(), rack.subList(i + 1, rack.size()), permutations, maxLeft);
-                }
-            }
-        }
-    }
-
-    private String leftWord(Square square, Direction direction) {
-        if(square.getSquareType() != SquareType.CONTAINS_LETTER) {
-            return "";
-        }
-        if(direction.equals(Direction.HORIZONTAL)) {
-            if(square.getX() > 0) {
-                return leftWord(board[square.getX() - 1][square.getY()], Direction.HORIZONTAL) + square.getValue();
-            } else {
-                return "";
-            }
-        } else if(direction.equals(Direction.VERTICAL)) {
-            if(square.getY() > 0) {
-                return leftWord(board[square.getX()][square.getY() - 1], Direction.VERTICAL) + square.getValue();
-            } else {
-                return "";
-            }
-        }
-        return "";
-    }
-
-    private String rightWord(Square square, Direction direction) {
-        if(!square.getSquareType().equals(SquareType.CONTAINS_LETTER)) {
-            return "";
-        }
-        if(direction.equals(Direction.HORIZONTAL)) {
-            if(square.getX() < BOARD_SIZE - 1) {
-                return  square.getValue() + leftWord(board[square.getX() + 1][square.getY()], Direction.HORIZONTAL);
-            } else {
-                return "";
-            }
-        } else if(direction.equals(Direction.VERTICAL)) {
-            if(square.getY() < BOARD_SIZE - 1) {
-                return square.getValue() + leftWord(board[square.getX()][square.getY() + 1], Direction.VERTICAL);
-            } else {
-                return "";
-            }
-        }
-        return "";
-    }
-
-    private List<Letter> remainingRack(List<Letter> rack, String word) {
-
-        List<Letter> remainingRack = rack;
-        for(int i = 0; i < word.length(); i++) {
-            for(Letter l : remainingRack) {
-                if(l.getLetter().equals(Character.toString(word.charAt(i)).toUpperCase())) {
-                    remainingRack.remove(l);
-                    break;
-                }
-            }
-        }
-        return remainingRack;
-    }
-
-    private void extendRight(Square square, List<Letter> remainingRack, List<Move> moves, String word, Player player, Direction direction) {
-        for(Letter l : square.getCrossCheckSet()) {
-            if(wordCollection.getDawg().contains((word + l.getLetter()).toLowerCase()) && remainingRack.contains(l)) {
-                if(direction.equals(Direction.HORIZONTAL)) {
-                    new Move(player, square.getX(), square.getY() - word.length(), direction, word + l.getLetter());
-                }
-                else {
-                    new Move(player, square.getX() - word.length(), square.getY(), direction, word + l.getLetter());
-                }
-            }
-            else if(wordCollection.getDawg().getStringsStartingWith((word + l.getLetter()).toLowerCase()).iterator().hasNext() && remainingRack.contains(l)){
-                if(direction.equals(Direction.HORIZONTAL)) {
-                    if(square.getY() < BOARD_SIZE - 1) {
-                        extendRight(board[square.getX()][square.getY() + 1], remainingRack(remainingRack, l.getLetter()), moves, word + l.getLetter(), player, direction);
-                    }
-                    else {
-                        return;
-                    }
-                }
-                else {
-                    if(square.getX() < BOARD_SIZE - 1) {
-                        extendRight(board[square.getX() + 1][square.getY()], remainingRack(remainingRack, l.getLetter()), moves, word + l.getLetter(), player, direction);
-                    }
-                    else {
-                        return;
-                    }
-                }
-            }
-        }
-    }
 }

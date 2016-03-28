@@ -12,11 +12,13 @@ public class Square {
     private boolean isAnchor;
     private int x;
     private int y;
-    private List<Letter> crossCheckSet;
+    private List<Letter> crossCheckSetHorizontal;
+    private List<Letter> crossCheckSetVertical;
 
     public Square(SquareType squareType, String value, int x, int y) {
         this.squareType = squareType;
-        this.crossCheckSet = new ArrayList<Letter>();
+        this.crossCheckSetHorizontal = new ArrayList<Letter>();
+        this.crossCheckSetVertical = new ArrayList<Letter>();
         this.value = value;
         this.isAnchor = false;
         this.x = x;
@@ -62,9 +64,23 @@ public class Square {
         this.y = y;
     }
 
-    public List<Letter> getCrossCheckSet() { return crossCheckSet; }
+    public List<Letter> getCrossCheckSetHorizontal() {
+        return crossCheckSetHorizontal;
+    }
 
-    public void setCrossCheckSet(List<Letter> crossCheckSet) { this.crossCheckSet = crossCheckSet; }
+    public void setCrossCheckSetHorizontal(List<Letter> crossCheckSetHorizontal) {
+        this.crossCheckSetHorizontal = crossCheckSetHorizontal;
+    }
+
+    public List<Letter> getCrossCheckSetVertical() {
+        return crossCheckSetVertical;
+    }
+
+    public void setCrossCheckSetVertical(List<Letter> crossCheckSetVertical) {
+        this.crossCheckSetVertical = crossCheckSetVertical;
+    }
+
+
     //endregion getters and setters
 
 
