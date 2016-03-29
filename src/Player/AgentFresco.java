@@ -18,14 +18,14 @@ public class AgentFresco implements Player {
 
     private final int MAX_TILES_ON_HAND = 7;
     private List<Letter> rack;
-    private List<Integer> scoreHistory;
+    private List<Move> moveHistory;
     private Board board;
     private int totalScore;
     private Move bestMove;
     private List<Move> moves;
 
     public AgentFresco(Bag bag, Board board) {
-        this.scoreHistory = new ArrayList<Integer>();
+        this.moveHistory = new ArrayList<Move>();
         this.rack = new ArrayList<Letter>();
         this.totalScore = 0;
         this.board = board;
@@ -41,12 +41,13 @@ public class AgentFresco implements Player {
         this.rack = rack;
     }
 
-    public List<Integer> getScoreHistory() {
-        return scoreHistory;
+    @Override
+    public List<Move> getMoveHistory() {
+        return moveHistory;
     }
 
-    public void setScoreHistory(List<Integer> scoreHistory) {
-        this.scoreHistory = scoreHistory;
+    public void setScoreHistory(List<Move> moveHistory) {
+        this.moveHistory = moveHistory;
     }
 
     @Override
@@ -58,6 +59,7 @@ public class AgentFresco implements Player {
         this.board = board;
     }
 
+    @Override
     public int getTotalScore() {
         return totalScore;
     }
@@ -65,6 +67,9 @@ public class AgentFresco implements Player {
     public void setTotalScore(int totalScore) {
         this.totalScore = totalScore;
     }
+
+
+
     //endregion getters and setters
 
     @Override
@@ -84,7 +89,7 @@ public class AgentFresco implements Player {
 
         if (bestMove != null) {
             removeFromRack(bestMove);
-            scoreHistory.add(bestMove.getScore());
+            moveHistory.add(bestMove);
             totalScore += bestMove.getScore();
         }
 

@@ -28,7 +28,7 @@ public class Score {
         if(move.getDirection().equals(Direction.HORIZONTAL)) {
             for(int i = 0; i < move.getWord().length(); i++) {
                 // for every letter in word, call crossWordScore
-                // TODO: facta átt
+                // TODO: facta ï¿½tt
                 // check if curr square is empty BEFORE placing the word
                 if(!player.getBoard().getBoard()[move.getX()][move.getY() + i].getSquareType().equals(SquareType.CONTAINS_LETTER)) {
                     //score += crossWordScore(move.getX(), move.getY() + i, Direction.HORIZONTAL);
@@ -49,7 +49,7 @@ public class Score {
         else {
             for(int i = 0; i < move.getWord().length(); i++) {
                 // for every letter in word, call crossWordScore
-                // TODO: facta átt
+                // TODO: facta ï¿½tt
                 // check if curr square is empty BEFORE placing the word
                 if(player.getBoard().getBoard()[move.getX()][move.getY()].getSquareType() != SquareType.CONTAINS_LETTER) {
                     /*System.out.println("word to check, x: " + move.getX() + " y: " + move.getY() + " currletter: "
@@ -80,8 +80,10 @@ public class Score {
      * @return the score of the crosswords created by placing this letter
      */
     private int crossWordScore(int x, int y, Direction direction) {
+
         int score = 0;
         Square initSquare = player.getBoard().getBoard()[x][y];
+
         if(direction.equals(Direction.HORIZONTAL)) {
             // add letters above to crossWordScore
             for(Square s = initSquare; s.getSquareType().equals(SquareType.CONTAINS_LETTER) && s.getX() > 0; s = player.getBoard().getBoard()[x - 1][y]) {

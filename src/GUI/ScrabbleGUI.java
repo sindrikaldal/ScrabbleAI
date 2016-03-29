@@ -6,6 +6,7 @@ import java.awt.Dimension;
 import java.awt.GridLayout;
 import java.awt.Toolkit;
 
+import javax.imageio.plugins.jpeg.JPEGHuffmanTable;
 import javax.swing.BorderFactory;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -27,6 +28,7 @@ public class ScrabbleGUI extends JFrame {
     private Player playerTwo;
 
     Board board;
+    BorderLayout borderLayout;
 
     JPanel scorePanel;
     JPanel PlayerOneScore;
@@ -39,6 +41,9 @@ public class ScrabbleGUI extends JFrame {
     JLabel[] rackLabels;
     JLabel[][] squareLabels;
     JPanel[][] squares ;
+    JPanel[][] moveHistory;
+    JLabel[][] moveHistoryLabel;
+    JPanel movePanel;
 
     public ScrabbleGUI(Board board, Player playerOne, Player playerTwo) {
 
@@ -48,14 +53,23 @@ public class ScrabbleGUI extends JFrame {
         this.setSize(new Dimension(15, 15));
 
         /* The size and placement of the board on the screen*/
-        setLayout(new BorderLayout());
+        borderLayout = new BorderLayout();
+        this.setLayout(borderLayout);
         Toolkit tk = Toolkit.getDefaultToolkit();
         Dimension screenSize = tk.getScreenSize();
         setLocation(screenSize.width / 3, screenSize.height / 3);
 
         /* Initialize all the JFrame compontents */
+
+        /*The squares that form the board*/
         squareLabels = new JLabel[board.getBoardSize()][board.getBoardSize()];
         squares = new JPanel[board.getBoardSize()][board.getBoardSize()];
+
+        /* The squares that will contain the move history of the players*/
+        moveHistory = new JPanel[board.getBoardSize()][2];
+        moveHistoryLabel = new JLabel[board.getBoardSize()][2];
+        movePanel = new JPanel();
+
         scorePanel = new JPanel();
         rack = new JPanel[LETTER_COUNT];
         PlayerOneScore = new JPanel();
@@ -66,6 +80,7 @@ public class ScrabbleGUI extends JFrame {
 
         /* Initalize the board*/
         initGUI();
+
         setVisible(true);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         pack();
@@ -75,9 +90,11 @@ public class ScrabbleGUI extends JFrame {
         initGrid();
         initScorePanel();
         initLetterPanel();
-        add(gridPanel, BorderLayout.NORTH);
+        initMoveHistoryPanel();
+        add(gridPanel, BorderLayout.CENTER);
         add(rackPanel, BorderLayout.SOUTH);
-        add(scorePanel, BorderLayout.EAST);
+        add(scorePanel, BorderLayout.NORTH);
+        add(movePanel, BorderLayout.EAST);
     }
 
     private void initScorePanel() {
@@ -128,6 +145,37 @@ public class ScrabbleGUI extends JFrame {
         }
     }
 
+    private void initMoveHistoryPanel() {
+        movePanel.setLayout(new GridLayout(board.getBoardSize(), 2));
+        for(int i = 0; i < 2; i++) {
+            JPanel panel = new JPanel();
+            JLabel label = new JLabel("Player " + (i + 1));
+            label.setBackground(Color.BLACK);
+            panel.setBackground(Color.PINK);
+            panel.setSize(50, 50);
+            panel.setBorder(BorderFactory.createEtchedBorder());
+            panel.add(label);
+            moveHistory[0][i] = panel;
+            moveHistoryLabel[0][i] = label;
+            movePanel.add(panel);
+
+        }
+        for(int i = 1; i < board.getBoardSize(); i++) {
+            for(int j = 0; j < 2; j++) {
+                JPanel panel = new JPanel();
+                JLabel label = new JLabel("");
+                label.setBackground(Color.BLACK);
+                panel.setBackground(Color.PINK);
+                panel.setSize(50, 50);
+                panel.setBorder(BorderFactory.createEtchedBorder());
+                panel.add(label);
+                moveHistory[i][j] = panel;
+                moveHistoryLabel[i][j] = label;
+                movePanel.add(panel);
+            }
+        }
+    }
+
     public Color getSquareColor(Square square) {
         switch(square.getSquareType()) {
             case TRIPLE_WORD:
@@ -165,9 +213,9 @@ public class ScrabbleGUI extends JFrame {
 
     public void updateScores(Player player, Boolean isPlayerOne) {
         if(isPlayerOne) {
-            PlayerOneLabel.setText("Player 1 : " + ((HumanPlayer) player).getTotalScore());
+            PlayerOneLabel.setText("Player 1 : " + (player.getTotalScore()));
         } else {
-            PlayerTwoLabel.setText("Player 2 : " + ((AgentFresco) player).getTotalScore());
+            PlayerTwoLabel.setText("Player 2 : " + (player.getTotalScore()));
         }
     }
 
@@ -177,9 +225,23 @@ public class ScrabbleGUI extends JFrame {
         }
     }
 
-    public void updateBoard(Move move, Boolean isPlayerOne) {
+    public void updateMoveHistory(Player player, boolean isPlayerOne) {
+        for(int i = 0; i < player.getMoveHistory().size(); i++) {
+            if(isPlayerOne) {
+                moveHistoryLabel[i + 1][0].setText(player.getMoveHistory().get(i).getWord() + " " + player.getMoveHistory().get(i).getScore());
+            }
+            else {
+                moveHistoryLabel[i + 1][1].setText(player.getMoveHistory().get(i).getWord() + " " + player.getMoveHistory().get(i).getScore());
+            }
+
+        }
+    }
+
+    public void updateBoard(Move move, boolean isPlayerOne) {
 
         updateScores(move.getPlayer(), isPlayerOne);
+
+        updateMoveHistory(move.getPlayer(), isPlayerOne);
 
         if(move.getDirection().equals(Direction.VERTICAL)) {
             for(int i = move.getX(); i < move.getWord().length() + move.getX(); i++) {
@@ -201,6 +263,7 @@ public class ScrabbleGUI extends JFrame {
                 }
             }
         }
+
 
         updateLetterPanel(move.getPlayer());
 
