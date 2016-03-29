@@ -208,27 +208,31 @@ public class AgentFresco implements Player {
                 }
             }
         }
-        if (leftPermutations.size() == 0) {
-            String leftWord = "";
-            if(direction.equals(Direction.HORIZONTAL)) {
-                leftWord = leftWord(square, Direction.VERTICAL);
+        String leftWord = "";
+        if (direction.equals(Direction.VERTICAL)) {
+            if (square.getY() > 0) {
+                leftWord = leftWord(board.getBoard()[square.getX()][square.getY() - 1], Direction.HORIZONTAL);
+                System.out.println("hLeft word : " + leftWord);
             }
-            else {
-                leftWord = leftWord(square, Direction.HORIZONTAL);
+        } else {
+            if (square.getX() > 0) {
+                leftWord = leftWord(board.getBoard()[square.getX() - 1][square.getY()], Direction.VERTICAL);
+                System.out.println("kLeft word : " + leftWord);
             }
-            for (Letter l : square.getCrossCheckSet()) {
-                Iterable<String> children = board.getWordCollection().getDawg().getStringsStartingWith((leftWord + l.getLetter()).toLowerCase());
+        }
+//        System.out.println("Left word : " + leftWord);
+        for (Letter l : square.getCrossCheckSet()) {
+            Iterable<String> children = board.getWordCollection().getDawg().getStringsStartingWith((leftWord + l.getLetter()).toLowerCase());
 
-                if (children.iterator().hasNext()) {
-                    if (direction.equals(Direction.HORIZONTAL)) {
-                        if(square.getY() < board.getBoardSize() - 1) {
-                            extendRight(board.getBoard()[square.getX()][square.getY() + 1], rack, leftWord + l.getLetter(), direction);
-                        }
+            if (children.iterator().hasNext()) {
+                if (direction.equals(Direction.HORIZONTAL)) {
+                    if (square.getY() < board.getBoardSize() - 1) {
+                        extendRight(board.getBoard()[square.getX()][square.getY() + 1], rack, leftWord + l.getLetter(), direction);
+                    }
 
-                    } else {
-                        if(square.getX() < board.getBoardSize() - 1) {
-                            extendRight(board.getBoard()[square.getX() + 1][square.getY()], rack, leftWord + l.getLetter(), direction);
-                        }
+                } else {
+                    if (square.getX() < board.getBoardSize() - 1) {
+                        extendRight(board.getBoard()[square.getX() + 1][square.getY()], rack, leftWord + l.getLetter(), direction);
                     }
                 }
             }
