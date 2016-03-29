@@ -32,7 +32,7 @@ public class Game {
     }
 
     private void initalizePlayers() {
-        playerOne = new AgentFresco(bag, board);
+        playerOne = new HumanPlayer(bag, board);
         playerTwo = new AgentFresco(bag, board);
     }
 
@@ -40,9 +40,6 @@ public class Game {
         int i = 0;
         while(bag.getBag().size() > 5) {
 
-            if(i == 5) {
-                return;
-            }
             /* Player's one turn*/
             Move playerOneMove = playerOne.makeMove();
             playerOne.fillRack(bag);

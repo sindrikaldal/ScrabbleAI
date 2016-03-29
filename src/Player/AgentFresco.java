@@ -7,6 +7,7 @@ import WordCollection.Letter;
 import Move.*;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
 
@@ -190,16 +191,42 @@ public class AgentFresco implements Player {
         findCrossCheckSets(direction);
         List<String> leftPermutations = findLeftPermutations(square, direction, rack);
         //List<String> leftPermutationsVertical = findLeftPermutations(square, Direction.VERTICAL, rack);
+
         /* For every string we found, try to extend that word to the right*/
         for (String s : leftPermutations) {
+
             List<Letter> remainingRack = remainingRack(rack, s);
+
             for (Letter l : square.getCrossCheckSet()) {
-                if (board.getWordCollection().getDawg().contains((s + l.getLetter()).toLowerCase())) {
-                    Iterable<String> children = board.getWordCollection().getDawg().getStringsStartingWith(s + l.getLetter());
+                Iterable<String> children = board.getWordCollection().getDawg().getStringsStartingWith((s + l.getLetter()).toLowerCase());
+                if (children.iterator().hasNext()) {
                     if (direction.equals(Direction.HORIZONTAL)) {
                         extendRight(board.getBoard()[square.getX()][square.getY() + 1], remainingRack, s + l.getLetter(), direction, children);
                     } else {
                         extendRight(board.getBoard()[square.getX() + 1][square.getY()], remainingRack, s + l.getLetter(), direction, children);
+                    }
+                }
+            }
+            System.out.print("-");
+        }
+        if (leftPermutations.size() == 0) {
+
+            System.out.print(".");
+
+            for (Letter l : square.getCrossCheckSet()) {
+
+                String leftWord = leftWord(square, direction);
+
+                if (leftWord.length() > 0) {
+
+                    Iterable<String> children = board.getWordCollection().getDawg().getStringsStartingWith((leftWord + l.getLetter()).toLowerCase());
+
+                    if (children.iterator().hasNext()) {
+                        if (direction.equals(Direction.HORIZONTAL)) {
+                            extendRight(board.getBoard()[square.getX()][square.getY() + 1], rack, leftWord + l.getLetter(), direction, children);
+                        } else {
+                            extendRight(board.getBoard()[square.getX() + 1][square.getY()], rack, leftWord + l.getLetter(), direction, children);
+                        }
                     }
                 }
             }
@@ -208,7 +235,6 @@ public class AgentFresco implements Player {
 
     /* Try to complete the word given the left permutation */
     private void extendRight(Square square, List<Letter> remainingRack, String word, Direction direction, Iterable<String> children) {
-        // erum við ekki alltaf að skoða tóma reiti? finnst eins og við skoðum aldrei reiti sem innihalda staf?
 
         if (!square.getSquareType().equals(SquareType.CONTAINS_LETTER)) {
             if (board.getWordCollection().getDawg().contains(word.toLowerCase())) {
@@ -220,103 +246,42 @@ public class AgentFresco implements Player {
             }
             for (String child : children) {
                 for (Letter letter : remainingRack) {
-                    if (Character.toString(child.charAt(word.length())).toUpperCase().equals(letter.getLetter()) && square.getCrossCheckSet().contains(letter)) {
-                        if (direction.equals(Direction.HORIZONTAL)) {
-                            if (square.getY() < board.getBoardSize() - 1) {
-                                extendRight(board.getBoard()[square.getX()][square.getY() + 1], remainingRack(remainingRack, letter.getLetter()), word + letter.getLetter(),
-                                        direction, board.getWordCollection().getDawg().getStringsStartingWith(word + letter.getLetter()));
+                    if (!child.equals(word.toLowerCase())) {
+                        if (Character.toString(child.charAt(word.length())).toUpperCase().equals(letter.getLetter()) && square.getCrossCheckSet().contains(letter)) {
+
+                            Iterable<String> it = board.getWordCollection().getDawg().getStringsStartingWith((word + letter.getLetter()).toLowerCase());
+
+                            if (direction.equals(Direction.HORIZONTAL)) {
+                                if (square.getY() < board.getBoardSize() - 1) {
+                                    extendRight(board.getBoard()[square.getX()][square.getY() + 1], remainingRack(remainingRack, letter.getLetter()), word + letter.getLetter(),
+                                            direction, it);
+                                }
+                            } else {
+                                if (square.getX() < board.getBoardSize() - 1) {
+                                    extendRight(board.getBoard()[square.getX() + 1][square.getY()], remainingRack(remainingRack, letter.getLetter()), word + letter.getLetter(),
+                                            direction, it);
+                                }
                             }
-                        } else {
-                            if (square.getX() < board.getBoardSize() - 1) {
-                                extendRight(board.getBoard()[square.getX() + 1][square.getY()], remainingRack(remainingRack, letter.getLetter()), word + letter.getLetter(),
-                                        direction, board.getWordCollection().getDawg().getStringsStartingWith(word + letter.getLetter()));
-                            }
+                            break;
                         }
                     }
                 }
             }
         } else {
-            if (board.getWordCollection().getDawg().getStringsStartingWith((word + square.getValue()).toLowerCase()).iterator().hasNext()) {
+            Iterable<String> it = board.getWordCollection().getDawg().getStringsStartingWith((word + square.getValue()).toLowerCase());
+
+            if (it.iterator().hasNext()) {
                 if (direction.equals(Direction.HORIZONTAL)) {
                     if (square.getY() < board.getBoardSize() - 1) {
-                        extendRight(board.getBoard()[square.getX()][square.getY() + 1], remainingRack(remainingRack, square.getValue()), word + square.getValue(),
-                                direction, board.getWordCollection().getDawg().getStringsStartingWith(word + square.getValue()));
+                        extendRight(board.getBoard()[square.getX()][square.getY() + 1], remainingRack(remainingRack, square.getValue()), word + square.getValue(), direction, it);
                     }
                 } else {
                     if (square.getX() < board.getBoardSize() - 1) {
-                        extendRight(board.getBoard()[square.getX() + 1][square.getY()], remainingRack(remainingRack, square.getValue()), word + square.getValue(),
-                                direction, board.getWordCollection().getDawg().getStringsStartingWith(word + square.getValue()));
+                        extendRight(board.getBoard()[square.getX() + 1][square.getY()], remainingRack(remainingRack, square.getValue()), word + square.getValue(), direction, it);
                     }
                 }
             }
         }
-
-//        if(direction.equals(Direction.HORIZONTAL)) {
-//            /* If the current square contains a letter */
-//            if(square.getSquareType().equals(SquareType.CONTAINS_LETTER)) {
-//                if(board.getWordCollection().getDawg().contains((word + square.getValue()).toLowerCase()) &&
-//                        !board.getBoard()[square.getX()][square.getY() + 1].getSquareType().equals(SquareType.CONTAINS_LETTER)) {
-//                    saveBestMove(new Move(this, square.getX(), square.getY() - word.length(), direction, word + square.getValue()));
-//                    if(square.getY() < board.getBoardSize() - 1) {
-//                        extendRight(board.getBoard()[square.getX()][square.getY() + 1], remainingRack(remainingRack, square.getValue()), word + square.getValue(), direction);
-//                    }
-//
-//                }
-//                else if(board.getWordCollection().getDawg().getStringsStartingWith((word + square.getValue()).toLowerCase()).iterator().hasNext()){
-//                    if(square.getY() < board.getBoardSize() - 1) {
-//                        extendRight(board.getBoard()[square.getX()][square.getY() + 1], remainingRack(remainingRack, square.getValue()), word + square.getValue(), direction);
-//                    }
-//                }
-//            }
-//            else {
-//                for(Letter l : square.getCrossCheckSet()) {
-//                    if(board.getWordCollection().getDawg().contains((word + l.getLetter()).toLowerCase()) && remainingRack.contains(l)
-//                            && !board.getBoard()[square.getX()][square.getY() + 1].getSquareType().equals(SquareType.CONTAINS_LETTER)) {
-//                        saveBestMove(new Move(this, square.getX(), square.getY() - word.length(), direction, word + l.getLetter()));
-//                        if(square.getY() < board.getBoardSize() - 1) {
-//                            extendRight(board.getBoard()[square.getX()][square.getY() + 1], remainingRack(remainingRack, l.getLetter()), word + l.getLetter(), direction);
-//                        }
-//                    }
-//                    else if(board.getWordCollection().getDawg().getStringsStartingWith((word + l.getLetter()).toLowerCase()).iterator().hasNext() && remainingRack.contains(l)){
-//                        if(square.getY() < board.getBoardSize() - 1) {
-//                            extendRight(board.getBoard()[square.getX()][square.getY() + 1], remainingRack(remainingRack, l.getLetter()), word + l.getLetter(), direction);
-//                        }
-//                    }
-//                }
-//            }
-//        }
-//        else {
-//            if(square.getSquareType().equals(SquareType.CONTAINS_LETTER)) {
-//                if(board.getWordCollection().getDawg().contains((word + square.getValue()).toLowerCase()) &&
-//                        !board.getBoard()[square.getX() + 1][square.getY()].getSquareType().equals(SquareType.CONTAINS_LETTER)) {
-//                    saveBestMove(new Move(this, square.getX() - word.length(), square.getY(), direction, word + square.getValue()));
-//                    if(square.getY() < board.getBoardSize() - 1) {
-//                        extendRight(board.getBoard()[square.getX() + 1][square.getY()], remainingRack(remainingRack, square.getValue()), word + square.getValue(), direction);
-//                    }
-//                }
-//                else if(board.getWordCollection().getDawg().getStringsStartingWith((word + square.getValue()).toLowerCase()).iterator().hasNext()){
-//                    if(square.getY() < board.getBoardSize() - 1) {
-//                        extendRight(board.getBoard()[square.getX() + 1][square.getY()], remainingRack(remainingRack, square.getValue()), word + square.getValue(), direction);
-//                    }
-//                }
-//            }
-//            else {
-//                for(Letter l : square.getCrossCheckSet()) {
-//                    if(board.getWordCollection().getDawg().contains((word + l.getLetter()).toLowerCase()) && remainingRack.contains(l) &&
-//                            !board.getBoard()[square.getX() + 1][square.getY()].getSquareType().equals(SquareType.CONTAINS_LETTER)) {
-//                        saveBestMove(new Move(this, square.getX() - word.length(), square.getY(), direction, word + l.getLetter()));
-//                        if(square.getX() < board.getBoardSize() - 1) {
-//                            extendRight(board.getBoard()[square.getX() + 1][square.getY()], remainingRack(remainingRack, l.getLetter()), word + l.getLetter(), direction);
-//                        }
-//                    }
-//                    else if(board.getWordCollection().getDawg().getStringsStartingWith((word + l.getLetter()).toLowerCase()).iterator().hasNext() && remainingRack.contains(l)){
-//                        if(square.getX() < board.getBoardSize() - 1) {
-//                            extendRight(board.getBoard()[square.getX() + 1][square.getY()], remainingRack(remainingRack, l.getLetter()), word + l.getLetter(), direction);
-//                        }
-//                    }
-//                }
-//            }
-//        }
     }
 
     public boolean containsAnchor(String word, Square square, Direction direction) {
@@ -340,6 +305,7 @@ public class AgentFresco implements Player {
 
     public List<String> findLeftPermutations(Square square, Direction direction, List<Letter> rack) {
 
+        System.out.print("*");
         List<String> permutations = new ArrayList<String>();
 
         int maxLeft = 0;
