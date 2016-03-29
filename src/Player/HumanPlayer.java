@@ -93,7 +93,9 @@ public class HumanPlayer implements Player {
         wordToReturn = wordToReturn.toUpperCase();
 
         removeFromRack(wordToReturn);
-        return new Move(this, x, y, direction, wordToReturn);
+        Move m = new Move(this, x, y, direction, wordToReturn);
+        totalScore += m.getScore();
+        return m;
     }
 
 

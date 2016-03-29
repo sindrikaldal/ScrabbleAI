@@ -457,7 +457,7 @@ public class AgentFresco implements Player {
 
     private List<Letter> remainingRack(List<Letter> rack, String word) {
 
-        List<Letter> remainingRack = new ArrayList<>();
+        List<Letter> remainingRack = new ArrayList<Letter>();
         for(Letter l : rack) {
             remainingRack.add(l);
         }
