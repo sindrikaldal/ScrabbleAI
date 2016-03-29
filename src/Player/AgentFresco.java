@@ -151,9 +151,6 @@ public class AgentFresco implements Player {
         for (int i = 0; i < board.getBoardSize(); i++) {
             for (int j = 0; j < board.getBoardSize(); j++) {
                 if (!board.getBoard()[i][j].getSquareType().equals(SquareType.CONTAINS_LETTER)) {
-                    if (board.getBoard()[i][j].isAnchor() && direction.equals(Direction.VERTICAL)) {
-                        System.out.print("");
-                    }
                     board.getBoard()[i][j].getCrossCheckSet().clear();
                     findCrossCheckSets(board.getBoard()[i][j], direction);
                     System.out.print("");
@@ -225,30 +222,32 @@ public class AgentFresco implements Player {
         }
 
 
-        String leftWord = "";
-        if(direction.equals(Direction.HORIZONTAL)) {
-            if(square.getY() > 0) {
-                leftWord = leftWord(board.getBoard()[square.getX()][square.getY() - 1], Direction.VERTICAL);
+        if(leftPermutations.size() == 0) {
+            String leftWord = "";
+            if(direction.equals(Direction.HORIZONTAL)) {
+                if(square.getY() > 0) {
+                    leftWord = leftWord(board.getBoard()[square.getX()][square.getY() - 1], Direction.VERTICAL);
+                }
             }
-        }
-        else {
-            if(square.getX() > 0) {
-                leftWord = leftWord(board.getBoard()[square.getX() - 1][square.getY()], Direction.HORIZONTAL);
+            else {
+                if(square.getX() > 0) {
+                    leftWord = leftWord(board.getBoard()[square.getX() - 1][square.getY()], Direction.HORIZONTAL);
+                }
             }
-        }
 
-        for (Letter l : square.getCrossCheckSet()) {
-            Iterable<String> children = board.getWordCollection().getDawg().getStringsStartingWith((leftWord + l.getLetter()).toLowerCase());
+            for (Letter l : square.getCrossCheckSet()) {
+                Iterable<String> children = board.getWordCollection().getDawg().getStringsStartingWith((leftWord + l.getLetter()).toLowerCase());
 
-            if (children.iterator().hasNext()) {
-                if (direction.equals(Direction.HORIZONTAL)) {
-                    if(square.getY() < board.getBoardSize() - 1) {
-                        extendRight(board.getBoard()[square.getX()][square.getY() + 1], rack, leftWord + l.getLetter(), direction);
-                    }
+                if (children.iterator().hasNext()) {
+                    if (direction.equals(Direction.HORIZONTAL)) {
+                        if(square.getY() < board.getBoardSize() - 1) {
+                            extendRight(board.getBoard()[square.getX()][square.getY() + 1], rack, leftWord + l.getLetter(), direction);
+                        }
 
-                } else {
-                    if(square.getX() < board.getBoardSize() - 1) {
-                        extendRight(board.getBoard()[square.getX() + 1][square.getY()], rack, leftWord + l.getLetter(), direction);
+                    } else {
+                        if(square.getX() < board.getBoardSize() - 1) {
+                            extendRight(board.getBoard()[square.getX() + 1][square.getY()], rack, leftWord + l.getLetter(), direction);
+                        }
                     }
                 }
             }
@@ -359,39 +358,43 @@ public class AgentFresco implements Player {
     }
 
     private String leftWord(Square square, Direction direction) {
-        if (square.getValue().equals("")) {
+        if (!square.getSquareType().equals(SquareType.CONTAINS_LETTER)) {
             return "";
         }
         if (direction.equals(Direction.VERTICAL)) {
             if (square.getY() > 0) {
                 return leftWord(board.getBoard()[square.getX()][square.getY() - 1], direction) + square.getValue();
-            } else {
-                return "";
+            }
+            else {
+                return square.getValue();
             }
         } else {
             if (square.getX() > 0) {
                 return leftWord(board.getBoard()[square.getX() - 1][square.getY()], direction) + square.getValue();
-            } else {
-                return "";
+            }
+            else {
+                return square.getValue();
             }
         }
     }
 
     private String rightWord(Square square, Direction direction) {
-        if (square.getValue().equals("")) {
+        if (!square.getSquareType().equals(SquareType.CONTAINS_LETTER)) {
             return "";
         }
         if (direction.equals(Direction.VERTICAL)) {
             if (square.getY() < board.getBoardSize() - 1) {
                 return square.getValue() + rightWord(board.getBoard()[square.getX()][square.getY() + 1], direction);
-            } else {
-                return "";
+            }
+            else {
+                return square.getValue();
             }
         } else {
             if (square.getX() < board.getBoardSize() - 1) {
                 return square.getValue() + rightWord(board.getBoard()[square.getX() + 1][square.getY()], direction);
-            } else {
-                return "";
+            }
+            else {
+                return square.getValue();
             }
         }
     }
