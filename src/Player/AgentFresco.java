@@ -201,31 +201,33 @@ public class AgentFresco implements Player {
                 Iterable<String> children = board.getWordCollection().getDawg().getStringsStartingWith((s + l.getLetter()).toLowerCase());
                 if (children.iterator().hasNext()) {
                     if (direction.equals(Direction.HORIZONTAL)) {
-                        extendRight(board.getBoard()[square.getX()][square.getY() + 1], remainingRack, s + l.getLetter(), direction, children);
+                        extendRight(board.getBoard()[square.getX()][square.getY() + 1], remainingRack, s + l.getLetter(), direction);
                     } else {
-                        extendRight(board.getBoard()[square.getX() + 1][square.getY()], remainingRack, s + l.getLetter(), direction, children);
+                        extendRight(board.getBoard()[square.getX() + 1][square.getY()], remainingRack, s + l.getLetter(), direction);
                     }
                 }
             }
-            System.out.print("-");
         }
         if (leftPermutations.size() == 0) {
-
-            System.out.print(".");
-
+            String leftWord = "";
+            if(direction.equals(Direction.HORIZONTAL)) {
+                leftWord = leftWord(square, Direction.VERTICAL);
+            }
+            else {
+                leftWord = leftWord(square, Direction.HORIZONTAL);
+            }
             for (Letter l : square.getCrossCheckSet()) {
+                Iterable<String> children = board.getWordCollection().getDawg().getStringsStartingWith((leftWord + l.getLetter()).toLowerCase());
 
-                String leftWord = leftWord(square, direction);
+                if (children.iterator().hasNext()) {
+                    if (direction.equals(Direction.HORIZONTAL)) {
+                        if(square.getY() < board.getBoardSize() - 1) {
+                            extendRight(board.getBoard()[square.getX()][square.getY() + 1], rack, leftWord + l.getLetter(), direction);
+                        }
 
-                if (leftWord.length() > 0) {
-
-                    Iterable<String> children = board.getWordCollection().getDawg().getStringsStartingWith((leftWord + l.getLetter()).toLowerCase());
-
-                    if (children.iterator().hasNext()) {
-                        if (direction.equals(Direction.HORIZONTAL)) {
-                            extendRight(board.getBoard()[square.getX()][square.getY() + 1], rack, leftWord + l.getLetter(), direction, children);
-                        } else {
-                            extendRight(board.getBoard()[square.getX() + 1][square.getY()], rack, leftWord + l.getLetter(), direction, children);
+                    } else {
+                        if(square.getX() < board.getBoardSize() - 1) {
+                            extendRight(board.getBoard()[square.getX() + 1][square.getY()], rack, leftWord + l.getLetter(), direction);
                         }
                     }
                 }
@@ -234,7 +236,7 @@ public class AgentFresco implements Player {
     }
 
     /* Try to complete the word given the left permutation */
-    private void extendRight(Square square, List<Letter> remainingRack, String word, Direction direction, Iterable<String> children) {
+    private void extendRight(Square square, List<Letter> remainingRack, String word, Direction direction) {
 
         if (!square.getSquareType().equals(SquareType.CONTAINS_LETTER)) {
             if (board.getWordCollection().getDawg().contains(word.toLowerCase())) {
@@ -244,28 +246,19 @@ public class AgentFresco implements Player {
                     saveBestMove(new Move(this, square.getX() - (word.length()), square.getY(), direction, word));
                 }
             }
-            for (String child : children) {
-                for (Letter letter : remainingRack) {
-                    if (!child.equals(word.toLowerCase())) {
-                        if (Character.toString(child.charAt(word.length())).toUpperCase().equals(letter.getLetter()) && square.getCrossCheckSet().contains(letter)) {
-
-                            Iterable<String> it = board.getWordCollection().getDawg().getStringsStartingWith((word + letter.getLetter()).toLowerCase());
-
-                            if (direction.equals(Direction.HORIZONTAL)) {
-                                if (square.getY() < board.getBoardSize() - 1) {
-                                    extendRight(board.getBoard()[square.getX()][square.getY() + 1], remainingRack(remainingRack, letter.getLetter()), word + letter.getLetter(),
-                                            direction, it);
-                                }
-                            } else {
-                                if (square.getX() < board.getBoardSize() - 1) {
-                                    extendRight(board.getBoard()[square.getX() + 1][square.getY()], remainingRack(remainingRack, letter.getLetter()), word + letter.getLetter(),
-                                            direction, it);
-                                }
+            for (Letter letter : remainingRack) {
+                Iterable<String> it = board.getWordCollection().getDawg().getStringsStartingWith((word + letter.getLetter()).toLowerCase());
+                    if(it.iterator().hasNext() && square.getCrossCheckSet().contains(letter)) {
+                        if (direction.equals(Direction.HORIZONTAL)) {
+                            if (square.getY() < board.getBoardSize() - 1) {
+                                extendRight(board.getBoard()[square.getX()][square.getY() + 1], remainingRack(remainingRack, letter.getLetter()), word + letter.getLetter(), direction);
                             }
-                            break;
+                        } else {
+                            if (square.getX() < board.getBoardSize() - 1) {
+                                extendRight(board.getBoard()[square.getX() + 1][square.getY()], remainingRack(remainingRack, letter.getLetter()), word + letter.getLetter(), direction);
+                            }
                         }
                     }
-                }
             }
         } else {
             Iterable<String> it = board.getWordCollection().getDawg().getStringsStartingWith((word + square.getValue()).toLowerCase());
@@ -273,39 +266,19 @@ public class AgentFresco implements Player {
             if (it.iterator().hasNext()) {
                 if (direction.equals(Direction.HORIZONTAL)) {
                     if (square.getY() < board.getBoardSize() - 1) {
-                        extendRight(board.getBoard()[square.getX()][square.getY() + 1], remainingRack(remainingRack, square.getValue()), word + square.getValue(), direction, it);
+                        extendRight(board.getBoard()[square.getX()][square.getY() + 1], remainingRack, word + square.getValue(), direction);
                     }
                 } else {
                     if (square.getX() < board.getBoardSize() - 1) {
-                        extendRight(board.getBoard()[square.getX() + 1][square.getY()], remainingRack(remainingRack, square.getValue()), word + square.getValue(), direction, it);
+                        extendRight(board.getBoard()[square.getX() + 1][square.getY()], remainingRack, word + square.getValue(), direction);
                     }
                 }
             }
-        }
-    }
-
-    public boolean containsAnchor(String word, Square square, Direction direction) {
-
-        if (direction.equals(Direction.HORIZONTAL)) {
-            for (int i = 1; i < word.length(); i++) {
-                if (board.getBoard()[square.getX()][square.getY() - i].isAnchor()) {
-                    return true;
-                }
-            }
-            return false;
-        } else {
-            for (int i = 1; i < word.length(); i++) {
-                if (board.getBoard()[square.getX() - i][square.getY()].isAnchor()) {
-                    return true;
-                }
-            }
-            return false;
         }
     }
 
     public List<String> findLeftPermutations(Square square, Direction direction, List<Letter> rack) {
 
-        System.out.print("*");
         List<String> permutations = new ArrayList<String>();
 
         int maxLeft = 0;
