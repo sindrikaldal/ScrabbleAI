@@ -96,9 +96,14 @@ public class AgentFresco implements Player {
         Random random = new Random();
         int rackSize = rack.size();
         for (int i = 0; i < (MAX_TILES_ON_HAND - rackSize); i++) {
-            int randomNumber = random.nextInt(bag.getBag().size());
-            rack.add(bag.getBag().get(randomNumber));
-            bag.getBag().remove(randomNumber);
+            try {
+                int randomNumber = random.nextInt(bag.getBag().size());
+                rack.add(bag.getBag().get(randomNumber));
+                bag.getBag().remove(randomNumber);
+            }
+            catch(IllegalArgumentException ex) {
+                System.out.println("");
+            }
         }
     }
 
@@ -202,35 +207,43 @@ public class AgentFresco implements Player {
                 Iterable<String> children = board.getWordCollection().getDawg().getStringsStartingWith((s + l.getLetter()).toLowerCase());
                 if (children.iterator().hasNext()) {
                     if (direction.equals(Direction.HORIZONTAL)) {
-                        extendRight(board.getBoard()[square.getX()][square.getY() + 1], remainingRack, s + l.getLetter(), direction);
+                        if(square.getY() < board.getBoardSize() - 1) {
+                            extendRight(board.getBoard()[square.getX()][square.getY() + 1], remainingRack, s + l.getLetter(), direction);
+                        }
                     } else {
-                        extendRight(board.getBoard()[square.getX() + 1][square.getY()], remainingRack, s + l.getLetter(), direction);
+                        if(square.getX() < board.getBoardSize() - 1) {
+                            extendRight(board.getBoard()[square.getX() + 1][square.getY()], remainingRack, s + l.getLetter(), direction);
+                        }
                     }
-
                 }
             }
         }
-        if (leftPermutations.size() == 0) {
-            String leftWord = "";
-            if(direction.equals(Direction.HORIZONTAL)) {
-                leftWord = leftWord(square, Direction.VERTICAL);
-            }
-            else {
-                leftWord = leftWord(square, Direction.HORIZONTAL);
-            }
-            for (Letter l : square.getCrossCheckSet()) {
-                Iterable<String> children = board.getWordCollection().getDawg().getStringsStartingWith((leftWord + l.getLetter()).toLowerCase());
 
-                if (children.iterator().hasNext()) {
-                    if (direction.equals(Direction.HORIZONTAL)) {
-                        if(square.getY() < board.getBoardSize() - 1) {
-                            extendRight(board.getBoard()[square.getX()][square.getY() + 1], rack, leftWord + l.getLetter(), direction);
-                        }
 
-                    } else {
-                        if(square.getX() < board.getBoardSize() - 1) {
-                            extendRight(board.getBoard()[square.getX() + 1][square.getY()], rack, leftWord + l.getLetter(), direction);
-                        }
+        String leftWord = "";
+        if(direction.equals(Direction.HORIZONTAL)) {
+            if(square.getY() > 0) {
+                leftWord = leftWord(board.getBoard()[square.getX()][square.getY() - 1], Direction.VERTICAL);
+            }
+        }
+        else {
+            if(square.getX() > 0) {
+                leftWord = leftWord(board.getBoard()[square.getX() - 1][square.getY()], Direction.HORIZONTAL);
+            }
+        }
+
+        for (Letter l : square.getCrossCheckSet()) {
+            Iterable<String> children = board.getWordCollection().getDawg().getStringsStartingWith((leftWord + l.getLetter()).toLowerCase());
+
+            if (children.iterator().hasNext()) {
+                if (direction.equals(Direction.HORIZONTAL)) {
+                    if(square.getY() < board.getBoardSize() - 1) {
+                        extendRight(board.getBoard()[square.getX()][square.getY() + 1], rack, leftWord + l.getLetter(), direction);
+                    }
+
+                } else {
+                    if(square.getX() < board.getBoardSize() - 1) {
+                        extendRight(board.getBoard()[square.getX() + 1][square.getY()], rack, leftWord + l.getLetter(), direction);
                     }
                 }
             }
