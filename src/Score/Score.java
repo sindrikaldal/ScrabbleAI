@@ -57,11 +57,13 @@ public class Score {
                     score += crossWordScore(move.getX() + i, move.getY(), Direction.VERTICAL);*/
                 }
                 for(Letter l : player.getBoard().getWordCollection().getLetters()) {
-                    if(Character.toString(move.getWord().charAt(i)).equals(l.getLetter())) {
-                        score += l.getValue() * letterMultiplier(player.getBoard().getBoard()[move.getX() + i][move.getY()]);
-                    }
-                    if(wordMultiplier(player.getBoard().getBoard()[move.getX() + i][move.getY()]) > wordMultiplier) {
-                        wordMultiplier = wordMultiplier(player.getBoard().getBoard()[move.getX() + i][move.getY()]);
+                    if(move.getX() < player.getBoard().getBoardSize() - 1) {
+                        if(Character.toString(move.getWord().charAt(i)).equals(l.getLetter())) {
+                            score += l.getValue() * letterMultiplier(player.getBoard().getBoard()[move.getX() + i][move.getY()]);
+                        }
+                        if(wordMultiplier(player.getBoard().getBoard()[move.getX() + i][move.getY()]) > wordMultiplier) {
+                            wordMultiplier = wordMultiplier(player.getBoard().getBoard()[move.getX() + i][move.getY()]);
+                        }
                     }
                 }
             }

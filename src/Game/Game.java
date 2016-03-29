@@ -32,11 +32,12 @@ public class Game {
     }
 
     private void initalizePlayers() {
-        playerOne = new HumanPlayer(bag, board);
+        playerOne = new AgentFresco(bag, board);
         playerTwo = new AgentFresco(bag, board);
     }
 
     public void startGame() {
+        int i = 0;
         while(bag.getBag().size() > 5) {
 
             /* Player's one turn*/
@@ -56,6 +57,7 @@ public class Game {
 
             /* Update the anchors of the board */
             board.updateAnchors();
+            i++;
         }
     }
 }
