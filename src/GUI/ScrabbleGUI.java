@@ -165,9 +165,9 @@ public class ScrabbleGUI extends JFrame {
 
     public void updateScores(Player player) {
         if(player instanceof  HumanPlayer) {
-            PlayerOneLabel.setText("Player 1 : ");
+            PlayerOneLabel.setText("Player 1 : " + ((HumanPlayer) player).getTotalScore());
         } else {
-            PlayerTwoLabel.setText("Player 2 : ");
+            PlayerTwoLabel.setText("Player 2 : " + ((AgentFresco) player).getTotalScore());
         }
     }
 
