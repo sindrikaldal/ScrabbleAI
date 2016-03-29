@@ -163,8 +163,8 @@ public class ScrabbleGUI extends JFrame {
         }
     }
 
-    public void updateScores(Player player) {
-        if(player instanceof  HumanPlayer) {
+    public void updateScores(Player player, Boolean isPlayerOne) {
+        if(isPlayerOne) {
             PlayerOneLabel.setText("Player 1 : " + ((HumanPlayer) player).getTotalScore());
         } else {
             PlayerTwoLabel.setText("Player 2 : " + ((AgentFresco) player).getTotalScore());
@@ -177,9 +177,9 @@ public class ScrabbleGUI extends JFrame {
         }
     }
 
-    public void updateBoard(Move move) {
+    public void updateBoard(Move move, Boolean isPlayerOne) {
 
-        updateScores(move.getPlayer());
+        updateScores(move.getPlayer(), isPlayerOne);
 
         if(move.getDirection().equals(Direction.VERTICAL)) {
             for(int i = move.getX(); i < move.getWord().length() + move.getX(); i++) {

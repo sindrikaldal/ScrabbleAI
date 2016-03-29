@@ -43,7 +43,7 @@ public class Game {
             /* Player's one turn*/
             Move playerOneMove = playerOne.makeMove();
             playerOne.fillRack(bag);
-            gui.updateBoard(playerOneMove);
+            gui.updateBoard(playerOneMove, true);
 
 
             /* Update the anchors of the board */
@@ -52,7 +52,7 @@ public class Game {
             /* Player's two turn*/
             Move playerTwoMove = playerTwo.makeMove();
             playerTwo.fillRack(bag);
-            gui.updateBoard(playerTwoMove);
+            gui.updateBoard(playerTwoMove, false);
 
 
             /* Update the anchors of the board */
