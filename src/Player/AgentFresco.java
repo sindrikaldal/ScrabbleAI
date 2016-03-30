@@ -6,10 +6,7 @@ import Move.Move;
 import WordCollection.Letter;
 import Move.*;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 
 /**
  * Created by sindrikaldal on 23/03/16.
@@ -23,13 +20,18 @@ public class AgentFresco implements Player {
     private int totalScore;
     private Move bestMove;
     private List<Move> moves;
+    private Bag bag;
+    private boolean lookAhead;
 
-    public AgentFresco(Bag bag, Board board) {
+    public AgentFresco(Bag bag, Board board, boolean lookAhead) {
         this.moveHistory = new ArrayList<Move>();
         this.rack = new ArrayList<Letter>();
         this.totalScore = 0;
         this.board = board;
+        moves = new ArrayList<Move>();
         fillRack(bag);
+        this.bag = bag;
+        this.lookAhead = lookAhead;
     }
 
     //region getters and setters
@@ -39,6 +41,11 @@ public class AgentFresco implements Player {
 
     public void setRack(List<Letter> rack) {
         this.rack = rack;
+    }
+
+    @Override
+    public List<Letter> getRack() {
+        return rack;
     }
 
     @Override
@@ -75,9 +82,11 @@ public class AgentFresco implements Player {
     @Override
     public Move makeMove() {
 
-        moves = new ArrayList<Move>();
+        /* At the start of each turn, empty the moves bag and initalize the best move to null*/
+        moves.clear();
         bestMove = null;
 
+        /* Examine each anchor square vertically and horizontally for moves */
         for (int i = 0; i < board.getBoardSize(); i++) {
             for (int j = 0; j < board.getBoardSize(); j++) {
                 if (board.getBoard()[i][j].isAnchor()) {
@@ -85,6 +94,10 @@ public class AgentFresco implements Player {
                     findMoves(board.getBoard()[i][j], Direction.VERTICAL);
                 }
             }
+        }
+
+        if(bag.getBag().isEmpty() && lookAhead) {
+            lookAhead();
         }
 
         if (bestMove != null) {
@@ -96,27 +109,24 @@ public class AgentFresco implements Player {
         return bestMove;
     }
 
+    /* Function to refill the rack after a move has been made */
     @Override
     public void fillRack(Bag bag) {
+
         Random random = new Random();
         int rackSize = rack.size();
+
         for (int i = 0; i < (MAX_TILES_ON_HAND - rackSize); i++) {
-            try {
+            /* Only take tiles from the bag if it isn't empty */
+            if(!bag.getBag().isEmpty()) {
                 int randomNumber = random.nextInt(bag.getBag().size());
                 rack.add(bag.getBag().get(randomNumber));
                 bag.getBag().remove(randomNumber);
             }
-            catch(IllegalArgumentException ex) {
-                System.out.println("");
-            }
         }
     }
 
-    @Override
-    public List<Letter> getRack() {
-        return rack;
-    }
-
+    /* Remove the tiles from the rack that were used in the move*/
     public void removeFromRack(Move move) {
         for (int i = 0; i < move.getWord().length(); i++) {
             for (int j = 0; j < rack.size(); j++) {
@@ -414,6 +424,87 @@ public class AgentFresco implements Player {
             }
         }
         return remainingRack;
+    }
+
+    private void lookAhead() {
+
+        int difference = Integer.MIN_VALUE;
+
+        Collections.sort(moves, new Comparator<Move>() {
+            @Override
+            public int compare(Move m1, Move m2) {
+                if (m1.getScore() > m2.getScore())
+                    return -1;
+                if (m1.getScore() < m2.getScore())
+                    return 1;
+                return 0;
+            }
+        });
+
+        int LIMIT = 5;
+
+        if(moves.size() < 5) {
+                LIMIT = moves.size();
+        }
+
+
+        Board tempBoard = new Board(board.getWordCollection());
+
+        AgentFresco opponent = new AgentFresco(this.bag, tempBoard, false);
+
+        for(int i = 0; i < LIMIT; i++) {
+
+            opponent.setRack(findOpponentsRack());
+
+            for(int row = 0; row < board.getBoardSize(); row++) {
+                for(int column = 0; column < board.getBoardSize(); column++) {
+                    tempBoard.getBoard()[row][column] = this.board.getBoard()[row][column];
+                }
+            }
+            
+            tempBoard.updateBoard(moves.get(i));
+            Move opponentMove = opponent.makeMove();
+            if(opponentMove == null) {
+                break;
+            } else if(moves.get(i).getScore() - opponentMove.getScore() > difference) {
+                bestMove = moves.get(i);
+            }
+        }
+        System.out.print("");
+    }
+
+    private List<Letter> findOpponentsRack() {
+
+        List<Letter> opponentsRack = new ArrayList<Letter>();
+
+        Bag tempBag = new Bag(board.getWordCollection().getLetters());
+
+        for(int i = 0; i < board.getBoardSize(); i++) {
+            for(int j = 0; j < board.getBoardSize(); j++) {
+                if(board.getBoard()[i][j].getSquareType().equals(SquareType.CONTAINS_LETTER)) {
+                    tempBag.getBag().remove(getLetter(board.getBoard()[i][j].getValue()));
+                }
+            }
+        }
+
+        for(Letter l : this.rack) {
+            tempBag.getBag().remove(l);
+        }
+
+        for(int i = 0; i < tempBag.getBag().size(); i++) {
+            opponentsRack.add(tempBag.getBag().get(i));
+        }
+
+        return opponentsRack;
+    }
+
+    private Letter getLetter(String value) {
+        for(Letter l : board.getWordCollection().getLetters()) {
+            if(l.getLetter().equals(value)) {
+                return l;
+            }
+        }
+        return null;
     }
 
 

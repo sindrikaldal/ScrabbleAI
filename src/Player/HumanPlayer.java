@@ -17,6 +17,7 @@ public class HumanPlayer implements Player {
     private List<Move> moveHistory;
     private Board board;
     private int totalScore;
+    private Bag bag;
 
 
     public HumanPlayer(Bag bag, Board board) {
@@ -25,6 +26,7 @@ public class HumanPlayer implements Player {
         this.totalScore = 0;
         fillRack(bag);
         this.board = board;
+        this.bag = bag;
     }
 
     //region getters and setters
@@ -69,6 +71,7 @@ public class HumanPlayer implements Player {
     public Move makeMove() {
         /* A Scanner to receieve instructions from console */
         Scanner in = new Scanner(System.in);
+
 
         System.out.println("Enter the x coordinates of the word");
         int x = in.nextInt();

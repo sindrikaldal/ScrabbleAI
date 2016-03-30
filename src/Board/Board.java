@@ -133,24 +133,6 @@ public class Board {
     }
     //endregion getter and setters
 
-    /* Check whether there are any squares adjacent to the given square that contain a letter */
-    public boolean hasAdjacentSquares(Square square) {
-
-        if(square.getX() > 0 && board[square.getX() - 1][square.getY()].getSquareType().equals(SquareType.CONTAINS_LETTER)) {
-            return true;
-        }
-        else if(square.getX() < (BOARD_SIZE - 1) && board[square.getX() + 1][square.getY()].getSquareType().equals(SquareType.CONTAINS_LETTER)) {
-            return true;
-        }
-        else if(square.getY() > 0 && board[square.getX()][square.getY() - 1].getSquareType().equals(SquareType.CONTAINS_LETTER)) {
-            return true;
-        }
-        else if(square.getY() < (BOARD_SIZE - 1) && board[square.getX()][square.getY() + 1].getSquareType().equals(SquareType.CONTAINS_LETTER)) {
-            return true;
-        }
-        return false;
-    }
-
     /* After each player's turn, update the anchor squares. Anchor is an empty square next to a square that contains a letter */
     public void updateAnchors() {
         for(int i = 0; i < BOARD_SIZE; i++) {
@@ -174,6 +156,14 @@ public class Board {
             }
         }
 
+    }
+
+    public void updateBoard(Move move) {
+        if(move.getDirection().equals(Direction.HORIZONTAL)) {
+            for(int i = move.getX(); i < move.getWord().length(); i++) {
+                board[i][move.getY() + i].setValue(Character.toString(move.getWord().charAt(i)).toUpperCase());
+            }
+        }
     }
 
 }

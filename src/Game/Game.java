@@ -32,8 +32,8 @@ public class Game {
     }
 
     private void initalizePlayers() {
-        playerOne = new AgentFresco(bag, board);
-        playerTwo = new AgentFresco(bag, board);
+        playerOne = new AgentFresco(bag, board, true);
+        playerTwo = new AgentFresco(bag, board, false);
     }
 
     public void startGame() {
@@ -42,40 +42,41 @@ public class Game {
 
             /* Player's one turn*/
             Move playerOneMove = playerOne.makeMove();
+
             if(playerOneMove == null) {
                 System.out.println("Player One couldn't find a move" );
             }
             else {
                 playerOne.fillRack(bag);
                 gui.updateBoard(playerOneMove, true);
+                /* Update the anchors of the board */
+                board.updateAnchors();
             }
-
-            /* Update the anchors of the board */
-            board.updateAnchors();
 
             /* Player's two turn*/
             Move playerTwoMove = playerTwo.makeMove();
+
             if(playerTwoMove == null) {
                 System.out.println("Player Two couldn't find a move" );
             }
             else {
                 playerTwo.fillRack(bag);
                 gui.updateBoard(playerTwoMove, false);
+                /* Update the anchors of the board */
+                board.updateAnchors();
             }
-            /* Update the anchors of the board */
-            board.updateAnchors();
         }
 
         if(playerOne.getTotalScore() > playerTwo.getTotalScore()) {
             System.out.println("Player One won with " + playerOne.getTotalScore() + " points");
         }
         else {
-            System.out.println("Player Two won with " + playerOne.getTotalScore() + " points");
+            System.out.println("Player Two won with " + playerTwo.getTotalScore() + " points");
         }
     }
 
     private boolean gameOver() {
-        if(bag.getBag().isEmpty()) {
+        if(bag.getBag().isEmpty() && (playerOne.getRack().isEmpty() || playerTwo.getRack().isEmpty())) {
             return true;
         }
         return false;
