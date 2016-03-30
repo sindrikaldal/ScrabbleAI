@@ -17,4 +17,6 @@ public abstract interface Player {
     public void fillRack(Bag bag);
     public List<Letter> getRack();
     public Board getBoard();
+    public int getTotalScore();
+    public List<Move> getMoveHistory();
 }

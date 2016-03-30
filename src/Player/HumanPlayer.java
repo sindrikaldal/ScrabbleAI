@@ -14,13 +14,13 @@ public class HumanPlayer implements Player {
 
     int RACK_COUNT = 7;
     private List<Letter> rack;
-    private List<Integer> scoreHistory;
+    private List<Move> moveHistory;
     private Board board;
     private int totalScore;
 
 
     public HumanPlayer(Bag bag, Board board) {
-        this.scoreHistory = new ArrayList<Integer>();
+        this.moveHistory = new ArrayList<Move>();
         rack = new ArrayList<Letter>();
         this.totalScore = 0;
         fillRack(bag);
@@ -29,6 +29,7 @@ public class HumanPlayer implements Player {
 
     //region getters and setters
 
+    @Override
     public int getTotalScore() {
         return totalScore;
     }
@@ -42,12 +43,12 @@ public class HumanPlayer implements Player {
         return RACK_COUNT;
     }
 
-    public List<Integer> getScoreHistory() {
-        return scoreHistory;
+    public List<Move> getMoveHistory() {
+        return moveHistory;
     }
 
-    public void setScoreHistory(List<Integer> scoreHistory) {
-        this.scoreHistory = scoreHistory;
+    public void setMoveHistory(List<Move> moveHistory) {
+        this.moveHistory = moveHistory;
     }
 
     public Board getBoard() {
@@ -93,7 +94,10 @@ public class HumanPlayer implements Player {
         wordToReturn = wordToReturn.toUpperCase();
 
         removeFromRack(wordToReturn);
-        return new Move(this, x, y, direction, wordToReturn);
+        Move m = new Move(this, x, y, direction, wordToReturn);
+        totalScore += m.getScore();
+        moveHistory.add(m);
+        return m;
     }
 
 
