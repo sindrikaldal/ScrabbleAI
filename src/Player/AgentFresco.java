@@ -229,21 +229,12 @@ public class AgentFresco implements Player {
                 }
             }
         }
-
-<<<<<<< HEAD
-        String leftWord = "";
-        if(direction.equals(Direction.HORIZONTAL)) {
-            if(square.getY() > 0) {
-                leftWord = leftWord(board.getBoard()[square.getX()][square.getY() - 1], Direction.VERTICAL);
-=======
-
         if(leftPermutations.size() == 0) {
             String leftWord = "";
             if(direction.equals(Direction.HORIZONTAL)) {
                 if(square.getY() > 0) {
                     leftWord = leftWord(board.getBoard()[square.getX()][square.getY() - 1], Direction.VERTICAL);
                 }
->>>>>>> 5994f6307ee681e483a7705b7da86e15240bfbe2
             }
             else {
                 if(square.getX() > 0) {
@@ -469,12 +460,17 @@ public class AgentFresco implements Player {
             
             tempBoard.updateBoard(moves.get(i));
             Move opponentMove = opponent.makeMove();
+            System.out.println("Current difference: " + (moves.get(i).getScore() - opponentMove.getScore()));
+
             if(opponentMove == null) {
                 break;
             } else if(moves.get(i).getScore() - opponentMove.getScore() > difference) {
+                difference = moves.get(i).getScore() - opponentMove.getScore();
                 bestMove = moves.get(i);
             }
         }
+        System.out.println("difference picked: " + difference);
+        System.out.println("Word picked " + bestMove.getWord());
         System.out.print("");
     }
 
