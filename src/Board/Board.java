@@ -158,17 +158,19 @@ public class Board {
 
     }
 
+
+    /* A function to update the move when the agent is looking ahead */
     public void updateBoard(Move move) {
         if(move.getDirection().equals(Direction.HORIZONTAL)) {
-            for(int i = move.getX(); i < move.getWord().length(); i++) {
-                board[i][move.getY() + (i - move.getX())].setValue(Character.toString(move.getWord().charAt(i)).toUpperCase());
-                board[i][move.getY() + (i - move.getX())].setSquareType(SquareType.CONTAINS_LETTER);
+            for(int i = move.getY(); i < move.getWord().length() + move.getY(); i++) {
+                board[move.getX()][i].setValue(Character.toString(move.getWord().charAt(i - move.getY())).toUpperCase());
+                board[move.getX()][i].setSquareType(SquareType.CONTAINS_LETTER);
             }
         }
         else {
-            for(int i = move.getY(); i < move.getWord().length(); i++) {
-                board[move.getX() + (i - move.getY())][i].setValue(Character.toString(move.getWord().charAt(i)).toUpperCase());
-                board[move.getX() + (i - move.getY())][i].setSquareType(SquareType.CONTAINS_LETTER);
+            for(int i = move.getX(); i < move.getWord().length() + move.getX(); i++) {
+                board[i][move.getY()].setValue(Character.toString(move.getWord().charAt(i - move.getX())).toUpperCase());
+                board[i][move.getY()].setSquareType(SquareType.CONTAINS_LETTER);
             }
         }
     }
