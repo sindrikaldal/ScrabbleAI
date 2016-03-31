@@ -66,8 +66,8 @@ public class ScrabbleGUI extends JFrame {
         squares = new JPanel[board.getBoardSize()][board.getBoardSize()];
 
         /* The squares that will contain the move history of the players*/
-        moveHistory = new JPanel[board.getBoardSize()][2];
-        moveHistoryLabel = new JLabel[board.getBoardSize()][2];
+        moveHistory = new JPanel[board.getBoardSize()][3];
+        moveHistoryLabel = new JLabel[board.getBoardSize()][3];
         movePanel = new JPanel();
 
         scorePanel = new JPanel();
@@ -146,12 +146,18 @@ public class ScrabbleGUI extends JFrame {
     }
 
     private void initMoveHistoryPanel() {
-        movePanel.setLayout(new GridLayout(board.getBoardSize(), 2));
-        for(int i = 0; i < 2; i++) {
+        movePanel.setLayout(new GridLayout(board.getBoardSize(), 3));
+        for(int i = 0; i < 3; i++) {
             JPanel panel = new JPanel();
-            JLabel label = new JLabel("Player " + (i + 1));
+            JLabel label;
+            if(i == 0) {
+                label = new JLabel("Umferð");
+            }
+            else {
+                label = new JLabel("Player " + (i));
+            }
             label.setBackground(Color.BLACK);
-            panel.setBackground(Color.PINK);
+            panel.setBackground(Color.ORANGE);
             panel.setSize(50, 50);
             panel.setBorder(BorderFactory.createEtchedBorder());
             panel.add(label);
@@ -161,11 +167,17 @@ public class ScrabbleGUI extends JFrame {
 
         }
         for(int i = 1; i < board.getBoardSize(); i++) {
-            for(int j = 0; j < 2; j++) {
+            for(int j = 0; j < 3; j++) {
                 JPanel panel = new JPanel();
                 JLabel label = new JLabel("");
                 label.setBackground(Color.BLACK);
-                panel.setBackground(Color.PINK);
+                if(j == 0) {
+                    panel.setBackground(Color.ORANGE);
+                }
+                else {
+                    panel.setBackground(Color.PINK);
+                }
+
                 panel.setSize(50, 50);
                 panel.setBorder(BorderFactory.createEtchedBorder());
                 panel.add(label);
@@ -227,11 +239,17 @@ public class ScrabbleGUI extends JFrame {
 
     public void updateMoveHistory(Player player, boolean isPlayerOne) {
         for(int i = 0; i < player.getMoveHistory().size(); i++) {
-            if(isPlayerOne) {
-                moveHistoryLabel[i + 1][0].setText(player.getMoveHistory().get(i).getWord() + " " + player.getMoveHistory().get(i).getScore());
+            try {
+                moveHistoryLabel[i + 1][0].setText("" + (i + 1));
+                if(isPlayerOne) {
+                    moveHistoryLabel[i + 1][1].setText(player.getMoveHistory().get(i).getWord() + " " + player.getMoveHistory().get(i).getScore());
+                }
+                else {
+                    moveHistoryLabel[i + 1][2].setText(player.getMoveHistory().get(i).getWord() + " " + player.getMoveHistory().get(i).getScore());
+                }
             }
-            else {
-                moveHistoryLabel[i + 1][1].setText(player.getMoveHistory().get(i).getWord() + " " + player.getMoveHistory().get(i).getScore());
+            catch(NullPointerException ex) {
+                System.out.println("");
             }
 
         }
