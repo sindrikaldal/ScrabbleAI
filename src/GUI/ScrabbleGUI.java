@@ -50,7 +50,7 @@ public class ScrabbleGUI extends JFrame {
         this.playerOne = playerOne;
         this.playerTwo = playerTwo;
         this.board = board;
-        this.setSize(new Dimension(15, 15));
+        this.setSize(new Dimension(25, 25));
 
         /* The size and placement of the board on the screen*/
         borderLayout = new BorderLayout();
@@ -66,8 +66,8 @@ public class ScrabbleGUI extends JFrame {
         squares = new JPanel[board.getBoardSize()][board.getBoardSize()];
 
         /* The squares that will contain the move history of the players*/
-        moveHistory = new JPanel[board.getBoardSize()][3];
-        moveHistoryLabel = new JLabel[board.getBoardSize()][3];
+        moveHistory = new JPanel[20][3];
+        moveHistoryLabel = new JLabel[20][3];
         movePanel = new JPanel();
 
         scorePanel = new JPanel();
@@ -146,7 +146,7 @@ public class ScrabbleGUI extends JFrame {
     }
 
     private void initMoveHistoryPanel() {
-        movePanel.setLayout(new GridLayout(board.getBoardSize(), 3));
+        movePanel.setLayout(new GridLayout(20, 3));
         for(int i = 0; i < 3; i++) {
             JPanel panel = new JPanel();
             JLabel label;
@@ -166,7 +166,7 @@ public class ScrabbleGUI extends JFrame {
             movePanel.add(panel);
 
         }
-        for(int i = 1; i < board.getBoardSize(); i++) {
+        for(int i = 1; i < 20; i++) {
             for(int j = 0; j < 3; j++) {
                 JPanel panel = new JPanel();
                 JLabel label = new JLabel("");
@@ -239,19 +239,13 @@ public class ScrabbleGUI extends JFrame {
 
     public void updateMoveHistory(Player player, boolean isPlayerOne) {
         for(int i = 0; i < player.getMoveHistory().size(); i++) {
-            try {
-                moveHistoryLabel[i + 1][0].setText("" + (i + 1));
-                if(isPlayerOne) {
-                    moveHistoryLabel[i + 1][1].setText(player.getMoveHistory().get(i).getWord() + " " + player.getMoveHistory().get(i).getScore());
-                }
-                else {
-                    moveHistoryLabel[i + 1][2].setText(player.getMoveHistory().get(i).getWord() + " " + player.getMoveHistory().get(i).getScore());
-                }
+            moveHistoryLabel[i + 1][0].setText("" + (i + 1));
+            if(isPlayerOne) {
+                moveHistoryLabel[i + 1][1].setText(player.getMoveHistory().get(i).getWord() + " " + player.getMoveHistory().get(i).getScore());
             }
-            catch(NullPointerException ex) {
-                System.out.println("");
+            else {
+                moveHistoryLabel[i + 1][2].setText(player.getMoveHistory().get(i).getWord() + " " + player.getMoveHistory().get(i).getScore());
             }
-
         }
     }
 

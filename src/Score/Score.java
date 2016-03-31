@@ -21,6 +21,9 @@ public class Score {
 
         /* The score to be returned */
         int score = 0;
+        int crosswordScore = 0;
+        int bonusScore = 0;
+        int tilesLaidOut = 0;
         /* The word multiplier of the word */
         int wordMultiplier = 1;
 
@@ -28,10 +31,18 @@ public class Score {
         if(move.getDirection().equals(Direction.HORIZONTAL)) {
             for(int i = 0; i < move.getWord().length(); i++) {
                 // for every letter in word, call crossWordScore
-                // TODO: facta �tt
                 // check if curr square is empty BEFORE placing the word
+
+                /* If the square we're about to lay a letter on doesn't contain a letter, check bot right and left if
+                 * there are word's we've added a letter to. */
                 if(!player.getBoard().getBoard()[move.getX()][move.getY() + i].getSquareType().equals(SquareType.CONTAINS_LETTER)) {
-                    //score += crossWordScore(move.getX(), move.getY() + i, Direction.HORIZONTAL);
+                    tilesLaidOut++;
+                    if(move.getX() > 0) {
+                        crosswordScore += adjacentLeftWordsScore(player.getBoard().getBoard()[move.getX() - 1][move.getY() + i], move.getDirection());
+                    }
+                    if(move.getX() < player.getBoard().getBoardSize() - 1) {
+                        crosswordScore += adjacentRightWordsScore(player.getBoard().getBoard()[move.getX() + 1][move.getY() + i], move.getDirection());
+                    }
                 }
                 for(Letter l : player.getBoard().getWordCollection().getLetters()) {
                     /* Find the value of each letter in the word and add it to the score. Multiple the letter multipier of the square if there exists one*/
@@ -40,7 +51,7 @@ public class Score {
                     }
                     /* If the current square is a word multiplier square, raise the current wordmultiplier*/
                     if(wordMultiplier(player.getBoard().getBoard()[move.getX()][move.getY() + i]) > wordMultiplier) {
-                        wordMultiplier = wordMultiplier(player.getBoard().getBoard()[move.getX()][move.getY() + i]);
+                        wordMultiplier *= wordMultiplier(player.getBoard().getBoard()[move.getX()][move.getY() + i]);
                     }
                 }
             }
@@ -49,12 +60,16 @@ public class Score {
         else {
             for(int i = 0; i < move.getWord().length(); i++) {
                 // for every letter in word, call crossWordScore
-                // TODO: facta �tt
                 // check if curr square is empty BEFORE placing the word
-                if(player.getBoard().getBoard()[move.getX()][move.getY()].getSquareType() != SquareType.CONTAINS_LETTER) {
-                    /*System.out.println("word to check, x: " + move.getX() + " y: " + move.getY() + " currletter: "
-                            + player.getBoard().getBoard()[move.getX() + i][move.getY()].getValue());
-                    score += crossWordScore(move.getX() + i, move.getY(), Direction.VERTICAL);*/
+                if(!player.getBoard().getBoard()[move.getX() + i][move.getY()].getSquareType().equals(SquareType.CONTAINS_LETTER)) {
+                    tilesLaidOut++;
+                    //crosswordScore += crossWordScore(move.getX() + i, move.getY(), Direction.VERTICAL);
+                    if(move.getY() > 0) {
+                        crosswordScore += adjacentLeftWordsScore(player.getBoard().getBoard()[move.getX() + i][move.getY() - 1], move.getDirection());
+                    }
+                    if(move.getY() < player.getBoard().getBoardSize() - 1) {
+                        crosswordScore += adjacentRightWordsScore(player.getBoard().getBoard()[move.getX() + i][move.getY() + 1], move.getDirection());
+                    }
                 }
                 for(Letter l : player.getBoard().getWordCollection().getLetters()) {
                     if(move.getX() < player.getBoard().getBoardSize() - 1) {
@@ -69,7 +84,10 @@ public class Score {
             }
         }
 
-        return score * wordMultiplier;
+        if(tilesLaidOut == 7) {
+            bonusScore = 50;
+        }
+        return (score * wordMultiplier) + crosswordScore + bonusScore;
     }
 
     /**
@@ -82,49 +100,55 @@ public class Score {
     private int crossWordScore(int x, int y, Direction direction) {
 
         int score = 0;
+
         Square initSquare = player.getBoard().getBoard()[x][y];
 
         if(direction.equals(Direction.HORIZONTAL)) {
             // add letters above to crossWordScore
-            for(Square s = initSquare; s.getSquareType().equals(SquareType.CONTAINS_LETTER) && s.getX() > 0; s = player.getBoard().getBoard()[x - 1][y]) {
+            for(Square s = initSquare; s.getSquareType().equals(SquareType.CONTAINS_LETTER) && s.getX() >= 0; s = player.getBoard().getBoard()[x--][y]) {
+
                 System.out.println("loop 1");
                 // go through all letters
                 for(Letter l : player.getBoard().getWordCollection().getLetters()) {
-                    if(s.getValue() == l.getLetter()) {
+                    if(s.getValue().equals(l.getLetter())) {
                         score += l.getValue();
+                        break;
                     }
                 }
             }
             // add letters below to crossWordScore
             //TODO: facta x-lengd, facta ==
-            for(Square s = initSquare; s.getSquareType().equals(SquareType.CONTAINS_LETTER) && s.getX() < 14; s = player.getBoard().getBoard()[x + 1][y]) {
+            for(Square s = initSquare; s.getSquareType().equals(SquareType.CONTAINS_LETTER) && s.getX() < 15; s = player.getBoard().getBoard()[x++][y]) {
                 System.out.println("loop 2");
                 // go through all letters
                 for(Letter l : player.getBoard().getWordCollection().getLetters()) {
-                    if(s.getValue() == l.getLetter()) {
+                    if(s.getValue().equals(l.getLetter())) {
                         score += l.getValue();
+                        break;
                     }
                 }
             }
         } else {
             // add letters to the right to crossWordScore
-            for(Square s = initSquare; s.getSquareType().equals(SquareType.CONTAINS_LETTER) && s.getY() > 0; s = player.getBoard().getBoard()[x][y - 1]) {
+            for(Square s = initSquare; s.getSquareType().equals(SquareType.CONTAINS_LETTER) && s.getY() >= 0; s = player.getBoard().getBoard()[x][y--]) {
                 System.out.println("loop 3");
                 // go through all letters
                 for(Letter l : player.getBoard().getWordCollection().getLetters()) {
-                    if(s.getValue() == l.getLetter()) {
+                    if(s.getValue().equals(l.getLetter())) {
                         score += l.getValue();
+                        break;
                     }
                 }
             }
             // add letters below to crossWordScore
             //TODO: facta x-lengd
-            for(Square s = initSquare; s.getSquareType().equals(SquareType.CONTAINS_LETTER) && s.getY() < 14; s = player.getBoard().getBoard()[x][y + 1]) {
+            for(Square s = initSquare; s.getSquareType().equals(SquareType.CONTAINS_LETTER) && s.getY() < 15; s = player.getBoard().getBoard()[x][y + 1]) {
                 System.out.println("loop 4");
                 // go through all letters
                 for(Letter l : player.getBoard().getWordCollection().getLetters()) {
-                    if(s.getValue() == l.getLetter()) {
-                        score += l.getValue() * letterMultiplier(s);
+                    if(s.getValue().equals(l.getLetter())) {
+                        score += l.getValue();
+                        break;
                     }
                 }
             }
@@ -137,6 +161,8 @@ public class Score {
             case TRIPLE_WORD:
                 return 3;
             case DOUBLE_WORD:
+                return 2;
+            case CENTER_SQUARE:
                 return 2;
             default:
                 return 1;
@@ -155,7 +181,60 @@ public class Score {
 
     }
 
-    private int adjacentWordsScore() {
+    private int adjacentLeftWordsScore(Square square, Direction direction) {
+
+        if(!square.getSquareType().equals(SquareType.CONTAINS_LETTER)) {
+            return 0;
+        }
+        for(Letter l : player.getBoard().getWordCollection().getLetters()) {
+            if(square.getValue().equals(l.getLetter())) {
+                if(direction.equals(Direction.HORIZONTAL)) {
+                    if(square.getX() > 0) {
+                        return adjacentLeftWordsScore(player.getBoard().getBoard()[square.getX() - 1][square.getY()], direction) +l.getValue();
+                    }
+                    else {
+                        return l.getValue();
+                    }
+                }
+                else {
+                    if(square.getY() > 0) {
+                        return adjacentLeftWordsScore(player.getBoard().getBoard()[square.getX()][square.getY() - 1], direction) + l.getValue();
+                    }
+                    else {
+                        return l.getValue();
+                    }
+                }
+            }
+        }
+        return 0;
+    }
+
+    private int adjacentRightWordsScore(Square square, Direction direction) {
+
+        if(!square.getSquareType().equals(SquareType.CONTAINS_LETTER)) {
+            return 0;
+        }
+
+        for(Letter l : player.getBoard().getWordCollection().getLetters()) {
+            if(square.getValue().equals(l.getLetter())) {
+                if(direction.equals(Direction.HORIZONTAL)) {
+                    if(square.getX() < player.getBoard().getBoardSize() - 1) {
+                        return adjacentRightWordsScore(player.getBoard().getBoard()[square.getX() + 1][square.getY()], direction) +l.getValue();
+                    }
+                    else {
+                        return l.getValue();
+                    }
+                }
+                else {
+                    if(square.getY() < player.getBoard().getBoardSize() - 1) {
+                        return adjacentRightWordsScore(player.getBoard().getBoard()[square.getX()][square.getY() + 1], direction) + l.getValue();
+                    }
+                    else {
+                        return l.getValue();
+                    }
+                }
+            }
+        }
         return 0;
     }
 }
