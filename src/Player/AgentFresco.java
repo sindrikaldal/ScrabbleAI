@@ -461,12 +461,13 @@ public class AgentFresco implements Player {
                     tempBoard.getBoard()[row][column] = this.board.getBoard()[row][column];
                 }
             }
-            
+
             tempBoard.updateBoard(moves.get(i));
             Move opponentMove = opponent.makeMove();
             if(opponentMove == null) {
                 break;
             } else if(moves.get(i).getScore() - opponentMove.getScore() > difference) {
+                difference = moves.get(i).getScore() - opponentMove.getScore();
                 bestMove = moves.get(i);
             }
         }

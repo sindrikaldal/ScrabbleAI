@@ -161,7 +161,14 @@ public class Board {
     public void updateBoard(Move move) {
         if(move.getDirection().equals(Direction.HORIZONTAL)) {
             for(int i = move.getX(); i < move.getWord().length(); i++) {
-                board[i][move.getY() + i].setValue(Character.toString(move.getWord().charAt(i)).toUpperCase());
+                board[i][move.getY() + (i - move.getX())].setValue(Character.toString(move.getWord().charAt(i)).toUpperCase());
+                board[i][move.getY() + (i - move.getX())].setSquareType(SquareType.CONTAINS_LETTER);
+            }
+        }
+        else {
+            for(int i = move.getY(); i < move.getWord().length(); i++) {
+                board[move.getX() + (i - move.getY())][i].setValue(Character.toString(move.getWord().charAt(i)).toUpperCase());
+                board[move.getX() + (i - move.getY())][i].setSquareType(SquareType.CONTAINS_LETTER);
             }
         }
     }
