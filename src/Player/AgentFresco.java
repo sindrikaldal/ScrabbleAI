@@ -216,15 +216,17 @@ public class AgentFresco implements Player {
             List<Letter> remainingRack = remainingRack(rack, s);
 
             for (Letter l : square.getCrossCheckSet()) {
-                Iterable<String> children = board.getWordCollection().getDawg().getStringsStartingWith((s + l.getLetter()).toLowerCase());
-                if (children.iterator().hasNext()) {
-                    if (direction.equals(Direction.HORIZONTAL)) {
-                        if(square.getY() < board.getBoardSize() - 1) {
-                            extendRight(board.getBoard()[square.getX()][square.getY() + 1], remainingRack, s + l.getLetter(), direction);
-                        }
-                    } else {
-                        if(square.getX() < board.getBoardSize() - 1) {
-                            extendRight(board.getBoard()[square.getX() + 1][square.getY()], remainingRack, s + l.getLetter(), direction);
+                if(remainingRack.contains(l)) {
+                    Iterable<String> children = board.getWordCollection().getDawg().getStringsStartingWith((s + l.getLetter()).toLowerCase());
+                    if (children.iterator().hasNext()) {
+                        if (direction.equals(Direction.HORIZONTAL)) {
+                            if(square.getY() < board.getBoardSize() - 1) {
+                                extendRight(board.getBoard()[square.getX()][square.getY() + 1], remainingRack(remainingRack, l.getLetter()), s + l.getLetter(), direction);
+                            }
+                        } else {
+                            if(square.getX() < board.getBoardSize() - 1) {
+                                extendRight(board.getBoard()[square.getX() + 1][square.getY()], remainingRack(remainingRack, l.getLetter()), s + l.getLetter(), direction);
+                            }
                         }
                     }
                 }
@@ -246,17 +248,19 @@ public class AgentFresco implements Player {
             }
 
             for (Letter l : square.getCrossCheckSet()) {
-                Iterable<String> children = board.getWordCollection().getDawg().getStringsStartingWith((leftWord + l.getLetter()).toLowerCase());
+                if(rack.contains(l)) {
+                    Iterable<String> children = board.getWordCollection().getDawg().getStringsStartingWith((leftWord + l.getLetter()).toLowerCase());
 
-                if (children.iterator().hasNext()) {
-                    if (direction.equals(Direction.HORIZONTAL)) {
-                        if(square.getY() < board.getBoardSize() - 1) {
-                            extendRight(board.getBoard()[square.getX()][square.getY() + 1], rack, leftWord + l.getLetter(), direction);
-                        }
+                    if (children.iterator().hasNext()) {
+                        if (direction.equals(Direction.HORIZONTAL)) {
+                            if(square.getY() < board.getBoardSize() - 1) {
+                                extendRight(board.getBoard()[square.getX()][square.getY() + 1], remainingRack(rack, l.getLetter()), leftWord + l.getLetter(), direction);
+                            }
 
-                    } else {
-                        if(square.getX() < board.getBoardSize() - 1) {
-                            extendRight(board.getBoard()[square.getX() + 1][square.getY()], rack, leftWord + l.getLetter(), direction);
+                        } else {
+                            if(square.getX() < board.getBoardSize() - 1) {
+                                extendRight(board.getBoard()[square.getX() + 1][square.getY()], remainingRack(rack, l.getLetter()), leftWord + l.getLetter(), direction);
+                            }
                         }
                     }
                 }
@@ -441,20 +445,18 @@ public class AgentFresco implements Player {
             }
         });
 
-        int LIMIT = 5;
+        int LIMIT = 10;
 
-        if(moves.size() < 5) {
+        if(moves.size() < 10) {
                 LIMIT = moves.size();
         }
 
 
-        Board tempBoard = new Board(board.getWordCollection());
 
-        AgentFresco opponent = new AgentFresco(this.bag, tempBoard, false);
 
         for(int i = 0; i < LIMIT; i++) {
 
-            opponent.setRack(findOpponentsRack());
+            Board tempBoard = new Board(board.getWordCollection());
 
             for(int row = 0; row < board.getBoardSize(); row++) {
                 for(int column = 0; column < board.getBoardSize(); column++) {
@@ -463,15 +465,25 @@ public class AgentFresco implements Player {
             }
 
             tempBoard.updateBoard(moves.get(i));
+
+            AgentFresco opponent = new AgentFresco(this.bag, tempBoard, false);
+
+            opponent.setRack(findOpponentsRack());
+
             Move opponentMove = opponent.makeMove();
+
             if(opponentMove == null) {
-                break;
-            } else if(moves.get(i).getScore() - opponentMove.getScore() > difference) {
+                opponentMove = new Move(this, 0, 0, Direction.HORIZONTAL, "");
+                opponentMove.setScore(0);
+            }
+
+            if(moves.get(i).getScore() - opponentMove.getScore() > difference) {
                 difference = moves.get(i).getScore() - opponentMove.getScore();
                 bestMove = moves.get(i);
             }
         }
-        System.out.print("");
+
+
     }
 
     private List<Letter> findOpponentsRack() {

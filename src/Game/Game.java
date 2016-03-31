@@ -38,15 +38,23 @@ public class Game {
 
     public void startGame() {
 
+        int playerOnePasses = 0;
+        int playerTwoPasses = 0;
+
         while(!gameOver()) {
 
             /* Player's one turn*/
             Move playerOneMove = playerOne.makeMove();
 
             if(playerOneMove == null) {
+                playerOnePasses++;
+                if(playerOnePasses == 3) {
+                    break;
+                }
                 System.out.println("Player One couldn't find a move" );
             }
             else {
+                playerOnePasses = 0;
                 playerOne.fillRack(bag);
                 gui.updateBoard(playerOneMove, true);
                 /* Update the anchors of the board */
@@ -57,9 +65,14 @@ public class Game {
             Move playerTwoMove = playerTwo.makeMove();
 
             if(playerTwoMove == null) {
+                playerTwoPasses++;
+                if(playerTwoPasses == 3) {
+                    break;
+                }
                 System.out.println("Player Two couldn't find a move" );
             }
             else {
+                playerOnePasses = 0;
                 playerTwo.fillRack(bag);
                 gui.updateBoard(playerTwoMove, false);
                 /* Update the anchors of the board */
@@ -67,6 +80,7 @@ public class Game {
             }
         }
 
+        System.out.println("Size of bag : " + bag.getBag().size());
         if(playerOne.getTotalScore() > playerTwo.getTotalScore()) {
             System.out.println("Player One won with " + playerOne.getTotalScore() + " points");
         }

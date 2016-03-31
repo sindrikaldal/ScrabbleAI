@@ -165,12 +165,14 @@ public class Board {
             for(int i = move.getY(); i < move.getWord().length() + move.getY(); i++) {
                 board[move.getX()][i].setValue(Character.toString(move.getWord().charAt(i - move.getY())).toUpperCase());
                 board[move.getX()][i].setSquareType(SquareType.CONTAINS_LETTER);
+                board[move.getX()][i].setAnchor(false);
             }
         }
         else {
             for(int i = move.getX(); i < move.getWord().length() + move.getX(); i++) {
                 board[i][move.getY()].setValue(Character.toString(move.getWord().charAt(i - move.getX())).toUpperCase());
                 board[i][move.getY()].setSquareType(SquareType.CONTAINS_LETTER);
+                board[move.getX()][i].setAnchor(false);
             }
         }
     }
