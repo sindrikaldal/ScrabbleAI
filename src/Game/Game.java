@@ -32,7 +32,7 @@ public class Game {
     }
 
     private void initalizePlayers() {
-        playerOne = new AgentFresco(bag, board, false);
+        playerOne = new AgentFresco(bag, board, true);
         playerTwo = new AgentFresco(bag, board, false);
     }
 

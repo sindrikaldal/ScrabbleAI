@@ -461,6 +461,8 @@ public class AgentFresco implements Player {
             tempBoard.updateBoard(moves.get(i));
             Move opponentMove = opponent.makeMove();
             System.out.println("Current difference: " + (moves.get(i).getScore() - opponentMove.getScore()));
+//            System.out.println("Our word " + moves.get(i).getWord());
+//            System.out.println("Opp word " + opponentMove.getWord());
 
             if(opponentMove == null) {
                 break;
