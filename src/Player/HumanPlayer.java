@@ -94,8 +94,11 @@ public class HumanPlayer implements Player {
 
         System.out.println("Input word to enter in field x:" + x + " y: " + y + " direction: " + direction);
         String wordToReturn = in.nextLine();
+
         wordToReturn = wordToReturn.toUpperCase();
+
         removeFromRack(wordToReturn);
+
         Move m = new Move(this, x, y, direction, wordToReturn);
         totalScore += m.getScore();
         moveHistory.add(m);
@@ -109,9 +112,11 @@ public class HumanPlayer implements Player {
         Random random = new Random();
         int rackSize = rack.size();
         for(int i = 0; i < (RACK_COUNT - rackSize); i++) {
-            int randomNumber = random.nextInt(bag.getBag().size());
-            rack.add(bag.getBag().get(randomNumber));
-            bag.getBag().remove(randomNumber);
+            if(!bag.getBag().isEmpty()) {
+                int randomNumber = random.nextInt(bag.getBag().size());
+                rack.add(bag.getBag().get(randomNumber));
+                bag.getBag().remove(randomNumber);
+            }
         }
     }
 

@@ -30,8 +30,6 @@ public class Score {
 
         if(move.getDirection().equals(Direction.HORIZONTAL)) {
             for(int i = 0; i < move.getWord().length(); i++) {
-                // for every letter in word, call crossWordScore
-                // check if curr square is empty BEFORE placing the word
 
                 /* If the square we're about to lay a letter on doesn't contain a letter, check bot right and left if
                  * there are word's we've added a letter to. */
@@ -59,11 +57,8 @@ public class Score {
         /* The same as above but raise the value of x instead of y since it vertical. */
         else {
             for(int i = 0; i < move.getWord().length(); i++) {
-                // for every letter in word, call crossWordScore
-                // check if curr square is empty BEFORE placing the word
                 if(!player.getBoard().getBoard()[move.getX() + i][move.getY()].getSquareType().equals(SquareType.CONTAINS_LETTER)) {
                     tilesLaidOut++;
-                    //crosswordScore += crossWordScore(move.getX() + i, move.getY(), Direction.VERTICAL);
                     if(move.getY() > 0) {
                         crosswordScore += adjacentLeftWordsScore(player.getBoard().getBoard()[move.getX() + i][move.getY() - 1], move.getDirection());
                     }
@@ -90,71 +85,6 @@ public class Score {
         return (score * wordMultiplier) + crosswordScore + bonusScore;
     }
 
-    /**
-     *
-     * @param x coordinates of letter
-     * @param y coordinates of letter
-     * @param direction of word being placed, if horizontal we check vertical crosswords and vice versa
-     * @return the score of the crosswords created by placing this letter
-     */
-    private int crossWordScore(int x, int y, Direction direction) {
-
-        int score = 0;
-
-        Square initSquare = player.getBoard().getBoard()[x][y];
-
-        if(direction.equals(Direction.HORIZONTAL)) {
-            // add letters above to crossWordScore
-            for(Square s = initSquare; s.getSquareType().equals(SquareType.CONTAINS_LETTER) && s.getX() >= 0; s = player.getBoard().getBoard()[x--][y]) {
-
-                System.out.println("loop 1");
-                // go through all letters
-                for(Letter l : player.getBoard().getWordCollection().getLetters()) {
-                    if(s.getValue().equals(l.getLetter())) {
-                        score += l.getValue();
-                        break;
-                    }
-                }
-            }
-            // add letters below to crossWordScore
-            //TODO: facta x-lengd, facta ==
-            for(Square s = initSquare; s.getSquareType().equals(SquareType.CONTAINS_LETTER) && s.getX() < 15; s = player.getBoard().getBoard()[x++][y]) {
-                System.out.println("loop 2");
-                // go through all letters
-                for(Letter l : player.getBoard().getWordCollection().getLetters()) {
-                    if(s.getValue().equals(l.getLetter())) {
-                        score += l.getValue();
-                        break;
-                    }
-                }
-            }
-        } else {
-            // add letters to the right to crossWordScore
-            for(Square s = initSquare; s.getSquareType().equals(SquareType.CONTAINS_LETTER) && s.getY() >= 0; s = player.getBoard().getBoard()[x][y--]) {
-                System.out.println("loop 3");
-                // go through all letters
-                for(Letter l : player.getBoard().getWordCollection().getLetters()) {
-                    if(s.getValue().equals(l.getLetter())) {
-                        score += l.getValue();
-                        break;
-                    }
-                }
-            }
-            // add letters below to crossWordScore
-            //TODO: facta x-lengd
-            for(Square s = initSquare; s.getSquareType().equals(SquareType.CONTAINS_LETTER) && s.getY() < 15; s = player.getBoard().getBoard()[x][y + 1]) {
-                System.out.println("loop 4");
-                // go through all letters
-                for(Letter l : player.getBoard().getWordCollection().getLetters()) {
-                    if(s.getValue().equals(l.getLetter())) {
-                        score += l.getValue();
-                        break;
-                    }
-                }
-            }
-        }
-        return score;
-    }
 
     private int wordMultiplier(Square square) {
         switch(square.getSquareType()) {

@@ -147,6 +147,7 @@ public class AgentFresco implements Player {
         }
     }
 
+    /* Everytime we encounter a legal move, we check if it's the best current move and update it*/
     public void saveBestMove(Move move) {
         moves.add(move);
 
@@ -168,6 +169,9 @@ public class AgentFresco implements Player {
         }
     }
 
+    /* The cross check is found by finding first the words left and right to the current square. If they're both empty,
+     * every letter in the rack goes in the cross check set. Otherwise, only letters from the rack that can form legal words
+     * can be laid down. */
     private void findCrossCheckSets(Square square, Direction direction) {
 
         String leftWord = "";
@@ -231,43 +235,48 @@ public class AgentFresco implements Player {
                 }
             }
         }
-        if(leftPermutations.size() == 0) {
-            String leftWord = "";
-            if(direction.equals(Direction.HORIZONTAL)) {
-                if(square.getY() > 0) {
-                    leftWord = leftWord(board.getBoard()[square.getX()][square.getY() - 1], Direction.VERTICAL);
-                }
+
+        /*If there were no permutations, still try to lay down a letter on the anchor square and extend a word to the right*/
+        String leftWord = "";
+
+        /* Find the word left to the square ( if there exists one ). */
+        if(direction.equals(Direction.HORIZONTAL)) {
+            if(square.getY() > 0) {
+                leftWord = leftWord(board.getBoard()[square.getX()][square.getY() - 1], Direction.VERTICAL);
             }
-            else {
-                if(square.getX() > 0) {
-                    leftWord = leftWord(board.getBoard()[square.getX() - 1][square.getY()], Direction.HORIZONTAL);
-                }
+        }
+        else {
+            if(square.getX() > 0) {
+                leftWord = leftWord(board.getBoard()[square.getX() - 1][square.getY()], Direction.HORIZONTAL);
             }
+        }
 
-            for (Letter l : square.getCrossCheckSet()) {
-                if(rack.contains(l)) {
-                    Iterable<String> children = board.getWordCollection().getDawg().getStringsStartingWith((leftWord + l.getLetter()).toLowerCase());
+        /* For every letter there is in the crosscheck set and in the rack, check if the letter can be laid down.*/
+        for (Letter l : square.getCrossCheckSet()) {
+            if(rack.contains(l)) {
+                Iterable<String> children = board.getWordCollection().getDawg().getStringsStartingWith((leftWord + l.getLetter()).toLowerCase());
 
-                    if (children.iterator().hasNext()) {
-                        if (direction.equals(Direction.HORIZONTAL)) {
-                            if(square.getY() < board.getBoardSize() - 1) {
-                                extendRight(board.getBoard()[square.getX()][square.getY() + 1], remainingRack(rack, l.getLetter()), leftWord + l.getLetter(), direction);
-                            }
+                if (children.iterator().hasNext()) {
+                    if (direction.equals(Direction.HORIZONTAL)) {
+                        if(square.getY() < board.getBoardSize() - 1) {
+                            extendRight(board.getBoard()[square.getX()][square.getY() + 1], remainingRack(rack, l.getLetter()), leftWord + l.getLetter(), direction);
+                        }
 
-                        } else {
-                            if(square.getX() < board.getBoardSize() - 1) {
-                                extendRight(board.getBoard()[square.getX() + 1][square.getY()], remainingRack(rack, l.getLetter()), leftWord + l.getLetter(), direction);
-                            }
+                    } else {
+                        if(square.getX() < board.getBoardSize() - 1) {
+                            extendRight(board.getBoard()[square.getX() + 1][square.getY()], remainingRack(rack, l.getLetter()), leftWord + l.getLetter(), direction);
                         }
                     }
                 }
             }
         }
+
     }
 
     /* Try to complete the word given the left permutation */
     private void extendRight(Square square, List<Letter> remainingRack, String word, Direction direction) {
 
+        /* If there's not a letter on the current square, check if we have a legal word and save it if it is. Then try to exted the word further*/
         if (!square.getSquareType().equals(SquareType.CONTAINS_LETTER)) {
             if (board.getWordCollection().getDawg().contains(word.toLowerCase())) {
                 if (direction.equals(Direction.HORIZONTAL)) {
@@ -307,6 +316,7 @@ public class AgentFresco implements Player {
         }
     }
 
+    /* Find left permutatuion for the given square and according to the given direction*/
     public List<String> findLeftPermutations(Square square, Direction direction, List<Letter> rack) {
 
         List<String> permutations = new ArrayList<String>();
@@ -348,6 +358,7 @@ public class AgentFresco implements Player {
         }
     }
 
+    /* Helper function to find all permutations of the letters in the rack up to the length of maxLeft*/
     private void permutation(String prefix, List<Letter> rack, List<String> permutations, int maxLeft) {
 
         if (prefix.length() <= maxLeft) {
@@ -447,9 +458,6 @@ public class AgentFresco implements Player {
                 LIMIT = moves.size();
         }
 
-
-
-
         for(int i = 0; i < LIMIT; i++) {
 
             Board tempBoard = new Board(board.getWordCollection());
@@ -467,10 +475,6 @@ public class AgentFresco implements Player {
             opponent.setRack(findOpponentsRack());
 
             Move opponentMove = opponent.makeMove();
-//            System.out.println("Current difference: " + (moves.get(i).getScore() - opponentMove.getScore()));
-//            System.out.println("Our word " + moves.get(i).getWord());
-//            System.out.println("Opp word " + opponentMove.getWord());
-
 
             if(opponentMove == null) {
                 opponentMove = new Move(this, 0, 0, Direction.HORIZONTAL, "");
@@ -482,11 +486,6 @@ public class AgentFresco implements Player {
                 bestMove = moves.get(i);
             }
         }
-//        System.out.println("difference picked: " + difference);
-//        System.out.println("Word picked " + bestMove.getWord());
-        System.out.print("");
-
-
     }
 
     private List<Letter> findOpponentsRack() {

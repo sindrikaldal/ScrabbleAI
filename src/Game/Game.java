@@ -38,6 +38,7 @@ public class Game {
 
     public void startGame() {
 
+        /* Variables to keep track of how often in a row player passes a move*/
         int playerOnePasses = 0;
         int playerTwoPasses = 0;
 
@@ -48,6 +49,7 @@ public class Game {
 
             if(playerOneMove == null) {
                 playerOnePasses++;
+                /* If player has passed move three times in a row, quit the game*/
                 if(playerOnePasses == 3) {
                     break;
                 }
@@ -66,6 +68,7 @@ public class Game {
 
             if(playerTwoMove == null) {
                 playerTwoPasses++;
+                /* If player has passed move three times in a row, quit the game*/
                 if(playerTwoPasses == 3) {
                     break;
                 }
@@ -80,7 +83,6 @@ public class Game {
             }
         }
 
-        System.out.println("Size of bag : " + bag.getBag().size());
         if(playerOne.getTotalScore() > playerTwo.getTotalScore()) {
             System.out.println("Player One won with " + playerOne.getTotalScore() + " points");
         }
