@@ -33,6 +33,7 @@ public class Game {
 
     private void initalizePlayers() {
         playerOne = new AgentFresco(bag, board, true);
+        //playerOne = new HumanPlayer(bag, board);
         playerTwo = new AgentFresco(bag, board, false);
     }
 
@@ -86,8 +87,11 @@ public class Game {
         if(playerOne.getTotalScore() > playerTwo.getTotalScore()) {
             System.out.println("Player One won with " + playerOne.getTotalScore() + " points");
         }
-        else {
+        else if(playerOne.getTotalScore() < playerTwo.getTotalScore()) {
             System.out.println("Player Two won with " + playerTwo.getTotalScore() + " points");
+        }
+        else {
+            System.out.println("A tie! Both players had " + playerOne.getTotalScore());
         }
     }
 

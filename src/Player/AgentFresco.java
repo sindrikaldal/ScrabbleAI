@@ -464,7 +464,7 @@ public class AgentFresco implements Player {
 
             for(int row = 0; row < board.getBoardSize(); row++) {
                 for(int column = 0; column < board.getBoardSize(); column++) {
-                    tempBoard.getBoard()[row][column] = this.board.getBoard()[row][column];
+                    tempBoard.getBoard()[row][column] = new Square(this.board.getBoard()[row][column].getSquareType(), this.board.getBoard()[row][column].getValue(), row, column);
                 }
             }
 
